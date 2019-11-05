@@ -53,14 +53,14 @@ public class main {
         char[] block = new char[cellLength];
         Arrays.fill(block, '-');
 
-        dividingLine.append("\n");
+        dividingLine.append(System.lineSeparator());
         for (int i = 1; i <= countCells; i++) {
             dividingLine.append(block);
             if (i != countCells) {
                 dividingLine.append("+");
             }
         }
-        dividingLine.append("\n");
+        dividingLine.append(System.lineSeparator());
 
         return dividingLine.toString();
     }
