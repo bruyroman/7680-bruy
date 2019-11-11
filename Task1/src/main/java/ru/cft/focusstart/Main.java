@@ -2,14 +2,14 @@ package ru.cft.focusstart;
 
 import java.util.Scanner;
 
-public class main {
+public class Main {
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         int sizeTable;
         System.out.println(String.format("Введите размер таблицы (от %d до %d): ", MultiplicationTable.MIN_SIZE, MultiplicationTable.MAX_SIZE));
 
         try (Scanner input = new Scanner(System.in)) {
-            if (input.hasNextInt()){
+            if (input.hasNextInt()) {
                 sizeTable = input.nextInt();
             } else {
                 System.out.println("Введены неверные данные!");
@@ -20,7 +20,7 @@ public class main {
         try {
             MultiplicationTable multiplicationTable = new MultiplicationTable(sizeTable);
             System.out.println(multiplicationTable.toString());
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
         }
     }

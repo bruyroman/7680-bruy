@@ -2,6 +2,7 @@ plugins {
     id 'java'
 }
 
+
 group 'ru.cft.focusstart'
 version '1.0-SNAPSHOT'
 
