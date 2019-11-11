@@ -8,23 +8,22 @@ public class MultiplicationTable {
     public static final int MAX_SIZE = 32;
     private int size;
 
-    public MultiplicationTable(int size) throws Exception {
+    public MultiplicationTable(int size) throws IllegalArgumentException {
         sizeCheck(size);
         this.size = size;
     }
 
-    private static void sizeCheck(int size) throws Exception {
+    private static void sizeCheck(int size) throws IllegalArgumentException {
         if (size < MIN_SIZE) {
-            throw new Exception("Введено слишком маленькое значение!");
+            throw new IllegalArgumentException("Введено слишком маленькое значение!");
         }
         if (size > MAX_SIZE) {
-            throw new Exception("Введено слишком большое значение!");
+            throw new IllegalArgumentException("Введено слишком большое значение!");
         }
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
         String format = "%" + getCellLength() + "d";
         String dividingLine = getDividingLine();
@@ -36,7 +35,7 @@ public class MultiplicationTable {
 
             for (int j = 0; j < size; j++) {
                 stringBuilder.append(String.format(format, (i + 1) * (j + 1)));
-                if (j + 1 < size){
+                if (j + 1 < size) {
                     stringBuilder.append("|");
                 }
             }
@@ -44,13 +43,11 @@ public class MultiplicationTable {
         return stringBuilder.toString();
     }
 
-    private Integer getCellLength()
-    {
+    private Integer getCellLength() {
         return ((Integer) (size * size)).toString().length();
     }
 
-    private String getDividingLine()
-    {
+    private String getDividingLine() {
         StringBuilder dividingLine = new StringBuilder();
         char[] block = new char[getCellLength()];
         Arrays.fill(block, '-');
