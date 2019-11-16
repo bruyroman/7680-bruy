@@ -7,4 +7,6 @@ public interface Figure2D {
     double getArea();
 
     double getPerimeter();
+
+    String getInformation();
 }

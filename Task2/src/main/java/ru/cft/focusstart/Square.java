@@ -5,7 +5,7 @@ public class Square extends FigureRectangular {
     public static final String NAME = "Квадрат";
     public static final String CODE = "SQUARE";
 
-    public Square(double sideLength) {
+    public Square(double sideLength) throws IllegalArgumentException {
         super(sideLength, sideLength);
     }
 
@@ -19,11 +19,12 @@ public class Square extends FigureRectangular {
     }
 
     @Override
-    public String toString() {
+    public String getInformation() {
         return "Тип фигуры: " + getName() + System.lineSeparator() +
                 "Площадь: " + getArea() + System.lineSeparator() +
                 "Периметр: " + getPerimeter() + System.lineSeparator() +
                 "Длина стороны: " + getSideLength() + System.lineSeparator() +
                 "Длина диагонали " + getLengthOfDiagonal();
     }
+
 }

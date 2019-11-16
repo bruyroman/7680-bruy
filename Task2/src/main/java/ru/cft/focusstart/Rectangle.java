@@ -5,7 +5,7 @@ public class Rectangle extends FigureRectangular {
     public static final String NAME = "Прямоугольник";
     public static final String CODE = "RECTANGLE";
 
-    public Rectangle(double width, double length) {
+    public Rectangle(double width, double length) throws IllegalArgumentException {
         super(width, length);
     }
 

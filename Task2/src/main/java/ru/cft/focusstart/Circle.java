@@ -7,7 +7,10 @@ public class Circle implements Figure2D {
 
     private double radius;
 
-    public Circle(double radius) {
+    public Circle(double radius) throws IllegalArgumentException {
+        if (radius < 0) {
+            throw new IllegalArgumentException("Входные значения не должны быть отрицательными.");
+        }
         this.radius = radius;
     }
 
@@ -35,11 +38,16 @@ public class Circle implements Figure2D {
     }
 
     @Override
-    public String toString() {
+    public String getInformation() {
         return "Тип фигуры: " + getName() + System.lineSeparator() +
                 "Площадь: " + getArea() + System.lineSeparator() +
                 "Периметр: " + getPerimeter() + System.lineSeparator() +
                 "Радиус: " + getRadius() + System.lineSeparator() +
                 "Диаметр " + getDiameter();
+    }
+
+    @Override
+    public String toString() {
+        return getInformation();
     }
 }

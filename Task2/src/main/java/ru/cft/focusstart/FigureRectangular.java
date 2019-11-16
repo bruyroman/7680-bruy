@@ -5,8 +5,10 @@ public abstract class FigureRectangular implements Figure2D {
     protected final double length;
     protected final double width;
 
-    public FigureRectangular(double width, double length) {
-        // проверка на отрицательные значения
+    public FigureRectangular(double width, double length) throws IllegalArgumentException {
+        if (width < 0 || length < 0) {
+            throw new IllegalArgumentException("Входные значения не должны быть отрицательными.");
+        }
         this.length = length;
         this.width = width;
     }
@@ -26,12 +28,17 @@ public abstract class FigureRectangular implements Figure2D {
     }
 
     @Override
-    public String toString() {
+    public String getInformation() {
         return "Тип фигуры: " + getName() + System.lineSeparator() +
                 "Площадь: " + getArea() + System.lineSeparator() +
                 "Периметр: " + getPerimeter() + System.lineSeparator() +
                 "Длина: " + length + System.lineSeparator() +
                 "Ширина: " + width + System.lineSeparator() +
                 "Длина диагонали: " + getLengthOfDiagonal();
+    }
+
+    @Override
+    public String toString() {
+        return getInformation();
     }
 }
