@@ -1,3 +1,4 @@
 rootProject.name = 'Tasks'
 include 'Task1'
+include 'Task2'
 
