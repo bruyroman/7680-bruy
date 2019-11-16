@@ -1,5 +1,7 @@
 package ru.cft.focusstart;
 
+import java.text.DecimalFormat;
+
 public class Circle implements Figure2D {
 
     public static final String NAME = "Круг";
@@ -39,11 +41,12 @@ public class Circle implements Figure2D {
 
     @Override
     public String getInformation() {
+        DecimalFormat df = new DecimalFormat("#.##");
         return "Тип фигуры: " + getName() + System.lineSeparator() +
-                "Площадь: " + getArea() + System.lineSeparator() +
-                "Периметр: " + getPerimeter() + System.lineSeparator() +
-                "Радиус: " + getRadius() + System.lineSeparator() +
-                "Диаметр " + getDiameter();
+                "Площадь: " + df.format(getArea()) + System.lineSeparator() +
+                "Периметр: " + df.format(getPerimeter()) + System.lineSeparator() +
+                "Радиус: " + df.format(getRadius()) + System.lineSeparator() +
+                "Диаметр " + df.format(getDiameter());
     }
 
     @Override

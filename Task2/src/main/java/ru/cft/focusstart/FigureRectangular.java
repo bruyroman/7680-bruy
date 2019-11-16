@@ -1,5 +1,7 @@
 package ru.cft.focusstart;
 
+import java.text.DecimalFormat;
+
 public abstract class FigureRectangular implements Figure2D {
 
     protected final double length;
@@ -29,12 +31,13 @@ public abstract class FigureRectangular implements Figure2D {
 
     @Override
     public String getInformation() {
+        DecimalFormat df = new DecimalFormat("#.##");
         return "Тип фигуры: " + getName() + System.lineSeparator() +
-                "Площадь: " + getArea() + System.lineSeparator() +
-                "Периметр: " + getPerimeter() + System.lineSeparator() +
-                "Длина: " + length + System.lineSeparator() +
-                "Ширина: " + width + System.lineSeparator() +
-                "Длина диагонали: " + getLengthOfDiagonal();
+                "Площадь: " + df.format(getArea()) + System.lineSeparator() +
+                "Периметр: " + df.format(getPerimeter()) + System.lineSeparator() +
+                "Длина: " + df.format(length) + System.lineSeparator() +
+                "Ширина: " + df.format(width) + System.lineSeparator() +
+                "Длина диагонали: " + df.format(getLengthOfDiagonal());
     }
 
     @Override
