@@ -21,7 +21,7 @@ public class Task2 {
             if (args.length == 1) {
                 System.out.println(getFigure2D(lines).toString());
             } else {
-                saveFile(args[1], getFigure2D(lines).toString());
+                saveInFile(args[1], getFigure2D(lines).toString());
             }
 
         } catch (Exception e) {
@@ -75,7 +75,7 @@ public class Task2 {
         return figure2D;
     }
 
-    public static void saveFile(String path, String text) throws IOException {
+    public static void saveInFile(String path, String text) throws IOException {
 
         File file = new File(path);
 
