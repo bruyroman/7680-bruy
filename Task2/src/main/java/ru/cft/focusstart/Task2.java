@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 
 public class Task2 {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         try {
             if (args.length < 1) {
                 System.out.println("Должен быть как минимум один входной аргумент.");
@@ -36,7 +36,7 @@ public class Task2 {
             throw new IllegalArgumentException("Указанный файл не найден.");
         }
 
-        String[] lines = null;
+        String[] lines;
         try (Stream<String> str = Files.lines(Paths.get(path))) {
             lines = str.toArray(value -> new String[value]);
         } catch (Exception e) {
@@ -51,7 +51,7 @@ public class Task2 {
             throw new IllegalArgumentException("Количество входных параметров не должно быть менее двух.");
         }
 
-        Figure2D figure2D = null;
+        Figure2D figure2D;
         switch (params[0]) {
             case Circle.CODE:
                 figure2D = new Circle(Integer.parseInt(params[1]));
