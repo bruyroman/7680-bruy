@@ -34,7 +34,7 @@ public class Consumer implements Runnable {
     public void run() {
         while (true) {
             try {
-                Thread.sleep(0);
+                Thread.sleep(productConsumptionTime);
                 LOGGER.info(Id + " потребитель, " + warehouse.pickUp().toString() + ", Ресурс потреблен");
             } catch (InterruptedException e) {
                 LOGGER.error(Id + " потребитель: " + System.lineSeparator() + e);
