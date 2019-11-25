@@ -2,19 +2,19 @@ package ru.cft.focusstart;
 
 public class Resource {
 
-    private static int counterID = 0;
-    private final int Id;
+    private static int counterId = 0;
+    private final int id;
 
     public Resource() {
-        Id = getNewId();
+        id = getNewId();
     }
 
     private synchronized static int getNewId() {
-        return counterID++;
+        return counterId++;
     }
 
     @Override
     public String toString() {
-        return "Ресурс №" + Id;
+        return "Ресурс №" + id;
     }
 }

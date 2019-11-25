@@ -7,8 +7,8 @@ public class Producer implements Runnable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Producer.class);
 
-    private static int counterID = 0;
-    private final int Id;
+    private static int counterId = 0;
+    private final int id;
     private final int productProductionTime;
     private final ResourceWarehouse warehouse;
 
@@ -22,12 +22,12 @@ public class Producer implements Runnable {
         }
 
         this.warehouse = warehouse;
-        Id = getNewId();
+        id = getNewId();
         this.productProductionTime = productProductionTime;
     }
 
     private synchronized static int getNewId() {
-        return counterID++;
+        return counterId++;
     }
 
     @Override
@@ -36,10 +36,10 @@ public class Producer implements Runnable {
             try {
                 Thread.sleep(productProductionTime);
                 Resource resource = new Resource();
-                LOGGER.info(Id + " производитель, " + resource.toString() + ", Ресурс произведен");
+                LOGGER.info(id + " производитель, " + resource.toString() + ", Ресурс произведен");
                 warehouse.put(resource);
             } catch (InterruptedException e) {
-                LOGGER.error(Id + " производитель: " + System.lineSeparator() + e);
+                LOGGER.error(id + " производитель: ", e);
             }
         }
     }
