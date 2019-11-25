@@ -7,8 +7,8 @@ public class Consumer implements Runnable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Consumer.class);
 
-    private static int counterID = 0;
-    private final int Id;
+    private static int counterId = 0;
+    private final int id;
     private final int productConsumptionTime;
     private final ResourceWarehouse warehouse;
 
@@ -22,22 +22,23 @@ public class Consumer implements Runnable {
         }
 
         this.warehouse = warehouse;
-        Id = getNewId();
+        id = getNewId();
         this.productConsumptionTime = productConsumptionTime;
     }
 
     private synchronized static int getNewId() {
-        return counterID++;
+        return counterId++;
     }
 
     @Override
     public void run() {
         while (true) {
             try {
+                Resource resource = warehouse.pickUp();
                 Thread.sleep(productConsumptionTime);
-                LOGGER.info(Id + " потребитель, " + warehouse.pickUp().toString() + ", Ресурс потреблен");
+                LOGGER.info(id + " потребитель, " + resource.toString() + ", Ресурс потреблен");
             } catch (InterruptedException e) {
-                LOGGER.error(Id + " потребитель: " + System.lineSeparator() + e);
+                LOGGER.error(id + " потребитель: ", e);
             }
         }
     }
