@@ -1,4 +1,4 @@
-package ru.cft.focusstart.client;
+package ru.cft.focusstart;
 
 import javax.swing.*;
 import java.awt.*;

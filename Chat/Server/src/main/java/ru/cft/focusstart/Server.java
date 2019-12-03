@@ -1,4 +1,4 @@
-package ru.cft.focusstart.server;
+package ru.cft.focusstart;
 
 public class Server {
 

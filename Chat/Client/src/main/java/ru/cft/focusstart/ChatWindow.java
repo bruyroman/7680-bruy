@@ -1,10 +1,12 @@
-package ru.cft.focusstart.client;
+package ru.cft.focusstart;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class ChatWindow extends JFrame {
 
@@ -18,9 +20,11 @@ public class ChatWindow extends JFrame {
     private JTextArea jtaUserMessage;
     private JScrollPane jspUserMessage;
     private JButton jbSendMessage;
+    private DateTimeFormatter dateTimeFormatter;
 
     public ChatWindow(Client client) {
         this.client = client;
+        dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm dd.MM.yy");
 
         //Настройки окна
         setTitle(CharsetConverter.cp1251ToUtf8("Чат"));
@@ -85,29 +89,12 @@ public class ChatWindow extends JFrame {
         updateUsers();
     }
 
-    private class KeyListenerUserMessage implements KeyListener {
-        @Override
-        public void keyTyped(KeyEvent e) {}
-
-        @Override
-        public void keyPressed(KeyEvent e) {
-            if (e.getKeyCode() == 10) {
-                e.consume();
-                sendMessage();
-            }
-        }
-
-        @Override
-        public void keyReleased(KeyEvent e) {}
-    }
-
     private void sendMessage(ActionEvent e) {
         sendMessage();
     }
 
     private void sendMessage() {
         if (jtaUserMessage.getText().trim().length() != 0) {
-            addMessage(client.getMyUserName(), CharsetConverter.utf8ToCp1251(jtaUserMessage.getText()).trim());
             client.sendMessage(CharsetConverter.utf8ToCp1251(jtaUserMessage.getText()).trim());
             jtaUserMessage.setText("");
             jtaUserMessage.setCaretPosition(0);
@@ -115,8 +102,8 @@ public class ChatWindow extends JFrame {
         jtaUserMessage.grabFocus();
     }
 
-    public void addMessage(String userName, String message) {
-        jtaMessages.append(CharsetConverter.cp1251ToUtf8(userName + ":" + System.lineSeparator() + message + System.lineSeparator() + System.lineSeparator()));
+    public void addMessage(String userName, LocalDateTime dateTime, String message) {
+        jtaMessages.append(CharsetConverter.cp1251ToUtf8(userName + " (" + dateTimeFormatter.format(dateTime) + "):" + System.lineSeparator() + message + System.lineSeparator() + System.lineSeparator()));
     }
 
     public void connectUser(String name) {
@@ -133,5 +120,21 @@ public class ChatWindow extends JFrame {
         jtaUsers.setText(CharsetConverter.cp1251ToUtf8("Ваше имя: " + client.getMyUserName() + System.lineSeparator() + System.lineSeparator() +
                 "В чате присутствуют:" + System.lineSeparator() +
                 String.join(System.lineSeparator(), client.getConnectedUsers())));
+    }
+
+    private class KeyListenerUserMessage implements KeyListener {
+        @Override
+        public void keyTyped(KeyEvent e) {}
+
+        @Override
+        public void keyPressed(KeyEvent e) {
+            if (e.getKeyCode() == 10) {
+                e.consume();
+                sendMessage();
+            }
+        }
+
+        @Override
+        public void keyReleased(KeyEvent e) {}
     }
 }
