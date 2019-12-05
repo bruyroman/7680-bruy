@@ -5,4 +5,5 @@ include 'Task3'
 include 'Chat'
 include 'Chat:Client'
 include 'Chat:Server'
+include 'Chat:Common'
 
