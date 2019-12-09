@@ -1,4 +1,7 @@
-package ru.cft.focusstart;
+package ru.cft.focusstart.View;
+
+import ru.cft.focusstart.CharsetConverter;
+import ru.cft.focusstart.Client;
 
 import javax.swing.*;
 import java.awt.*;
@@ -8,7 +11,7 @@ import java.awt.event.KeyListener;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-public class ChatWindow extends JFrame {
+public class ChatWindow extends JFrame implements ChatView {
 
     private Client client;
     private JPanel jPanelCenter;
@@ -89,6 +92,14 @@ public class ChatWindow extends JFrame {
         updateUsers();
     }
 
+    public void showView() {
+        setVisible(true);
+    }
+
+    public void hideView() {
+        setVisible(false);
+    }
+
     private void sendMessage(ActionEvent e) {
         sendMessage();
     }
@@ -103,20 +114,14 @@ public class ChatWindow extends JFrame {
     }
 
     public void addMessage(String userName, LocalDateTime dateTime, String message) {
-        jtaMessages.append(CharsetConverter.cp1251ToUtf8(userName + " (" + dateTimeFormatter.format(dateTime) + "):" + System.lineSeparator() + message + System.lineSeparator() + System.lineSeparator()));
+        addMessage(userName + " (" + dateTimeFormatter.format(dateTime) + "):" + System.lineSeparator() + message);
     }
 
-    public void connectUser(String name) {
-        jtaMessages.append(CharsetConverter.cp1251ToUtf8("В чат добавлен новый собеседник с именем " + name + System.lineSeparator() + System.lineSeparator()));
-        updateUsers();
+    public void addMessage(String message) {
+        jtaMessages.append(CharsetConverter.cp1251ToUtf8(message + System.lineSeparator() + System.lineSeparator()));
     }
 
-    public void disconnectUser(String name) {
-        jtaMessages.append(CharsetConverter.cp1251ToUtf8("Собеседник с именем  " + name + " вышел из чата" + System.lineSeparator() + System.lineSeparator()));
-        updateUsers();
-    }
-
-    private void updateUsers() {
+    public void updateUsers() {
         jtaUsers.setText(CharsetConverter.cp1251ToUtf8("Ваше имя: " + client.getMyUserName() + System.lineSeparator() + System.lineSeparator() +
                 "В чате присутствуют:" + System.lineSeparator() +
                 String.join(System.lineSeparator(), client.getConnectedUsers())));
