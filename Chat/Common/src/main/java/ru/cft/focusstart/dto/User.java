@@ -28,7 +28,6 @@ public class User extends Communication {
     public enum Events {
         NONE,
         JOINING,
-        SUCCESS,
         CLOSE
     }
 }

@@ -32,8 +32,6 @@ public class Client {
     }
 
     public void connect(String serverAddress, String userName) {
-        this.userName = userName;
-
         String[] address = serverAddress.split(":");
         if (address.length != 2) {
             System.out.println("Неверно введён адрес сервера!");
@@ -41,7 +39,7 @@ public class Client {
             return;
         }
 
-
+        this.userName = userName;
 
         try {
             connection = new Connection(address[0], Integer.valueOf(address[1]));
@@ -59,6 +57,10 @@ public class Client {
         chatView.set(new ChatWindow(this));
     }
 
+    public String getUserName() {
+        return userName;
+    }
+
     public String[] getConnectedUsers() {
         if (userNames != null && userNames.size() > 0) {
             return userNames.toArray(new String[0]);
@@ -69,20 +71,22 @@ public class Client {
 
     public void sendMessage(String message) {
         chatView.get().addMessage(userName, LocalDateTime.now(), message);
-        connection.sendCommunication(new UserMessage(userName, LocalDateTime.now(), message));
+        try {
+            connection.sendCommunication(new UserMessage(userName, LocalDateTime.now(), message));
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     public void acceptMessage(Communication communication) {
         if (communication.getClass().getName() == UserMessage.class.getName()) {
             UserMessage userMessage = (UserMessage) communication;
-            chatView.get().addMessage(userMessage.getUserName(), userMessage.getDateTime(), userMessage.getMessage());
-            User user = new User(userName);
-            user.setEvent(User.Events.SUCCESS);
-            connection.sendCommunication(user);
+            if (!userMessage.getUserName().equals(userName)) {
+                chatView.get().addMessage(userMessage.getUserName(), userMessage.getDateTime(), userMessage.getMessage());
+            }
 
         } else if (communication.getClass().getName() == ServerMessage.class.getName()) {
             ServerMessage serverMessage = (ServerMessage) communication;
-
             switch (serverMessage.getEvent()) {
                 case UPDATE_USERS:
                     userNames = serverMessage.getUserNames();
@@ -93,6 +97,7 @@ public class Client {
                     }
                     break;
                 case CLOSE:
+                    connection.close();
                     userNames = new ArrayList<>();
                     if (chatView.get() != null) {
                         chatView.get().addMessage(serverMessage.getMessage());
@@ -107,9 +112,6 @@ public class Client {
         }
     }
 
-    public String getUserName() {
-        return userName;
-    }
 }
 
 

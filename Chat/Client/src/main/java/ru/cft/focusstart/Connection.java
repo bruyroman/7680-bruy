@@ -19,6 +19,7 @@ public class Connection {
     private BufferedReader reader;
     private AtomicReference<PrintWriter> writer;
     private Thread messageListener;
+    private Client client;
 
     public Connection(String address, Integer port) {
         this.address = address;
@@ -35,19 +36,24 @@ public class Connection {
             throw new ConnectException("Сервер недоступен!" + System.lineSeparator() + e.getMessage());
         }
 
+        this.client = client;
+        joiningUser();
+
+        Runtime.getRuntime().addShutdownHook(new Thread(this::close));
+        messageListener = new Thread(this::runMessageListener);
+        messageListener.start();
+    }
+
+    private void joiningUser() throws ConnectException {
         try {
-            User user = new User(client.getUserName());
-            user.setEvent(User.Events.JOINING);
-            writer.get().println(Serialization.toJson(user));
+            writer.get().println(Serialization.toJson(new User(client.getUserName())
+                    .setEvent(User.Events.JOINING)));
             writer.get().flush();
 
-            reader.ready();
-            String json = reader.readLine();
-            Communication communication = Serialization.fromJson(json);
+            Communication communication = Serialization.fromJson(reader.readLine());
 
             if (communication.getClass().getName() == ServerMessage.class.getName()) {
                 ServerMessage serverMessage = (ServerMessage) communication;
-
                 switch (serverMessage.getEvent()) {
                     case SUCCESS:
                         break;
@@ -57,49 +63,46 @@ public class Connection {
                         throw new ConnectException("Некорректный ответ от сервера! (" + serverMessage.getEvent() + ")" + System.lineSeparator() + serverMessage.getMessage());
                 }
             } else {
-                throw new ConnectException("Некорректный ответ от сервера!" + System.lineSeparator() + json);
+                throw new ConnectException("Некорректный ответ от сервера!" + System.lineSeparator() + communication.getClass().getName());
             }
-
         } catch (IOException e) {
             throw new ConnectException("Сервер недоступен!" + System.lineSeparator() + e.getMessage());
         }
-        messageListener = getMessageListener(client);
-        messageListener.start();
-
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            try {
-                messageListener.interrupt();
-                User user = new User(client.getUserName());
-                user.setEvent(User.Events.CLOSE);
-                writer.get().println(Serialization.toJson(user));
-                writer.get().flush();
-                socket.close();
-            } catch (IOException e) {
-                System.out.println(e.getMessage());
-            }
-        }));
     }
 
-    private Thread getMessageListener(Client client) {
-       return new Thread(() -> {
-            while (!Thread.interrupted()) {
-                try {
-                    Communication communication = Serialization.fromJson(reader.readLine());
-                    client.acceptMessage(communication);
-                } catch (IOException e) {
+    public void close() {
+        try {
+            messageListener.interrupt();
+            writer.get().println(Serialization.toJson(new User(client.getUserName())
+                    .setEvent(User.Events.CLOSE)));
+            writer.get().flush();
+            socket.close();
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private void runMessageListener() {
+        boolean interrupted = false;
+        while (!interrupted) {
+            try {
+                client.acceptMessage(Serialization.fromJson(reader.readLine()));
+            }
+            catch (IOException e) {
+                interrupted = Thread.currentThread().isInterrupted() || socket.isClosed();
+                if (!interrupted) {
                     System.out.println("Ошибка при приёме сообщения!" + System.lineSeparator() + e.getMessage());
                 }
             }
-        });
+        }
     }
 
-
-    public void sendCommunication(Communication communication) {
+    public void sendCommunication(Communication communication) throws Exception {
         try {
             writer.get().println(Serialization.toJson(communication));
             writer.get().flush();
         } catch (IOException e) {
-            System.out.println("Ошибка при отправке сообщения!" + System.lineSeparator() + e.getMessage());
+            throw new Exception("Ошибка при отправке сообщения!", e);
         }
     }
 }
