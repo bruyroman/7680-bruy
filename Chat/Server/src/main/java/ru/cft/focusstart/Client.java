@@ -28,11 +28,11 @@ public class Client {
         return userName;
     }
 
-    public boolean ready() throws IOException {
+    public boolean haveMessage() throws IOException {
         return reader.ready();
     }
 
-    public String readLine() throws IOException {
+    public String getMessage() throws IOException {
         return reader.readLine();
     }
 

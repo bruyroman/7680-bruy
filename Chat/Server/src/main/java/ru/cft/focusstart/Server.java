@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -25,7 +26,7 @@ public class Server {
     public static void main(String[] args) {
         try {
             new Server().start();
-        } catch (IOException e) {
+        } catch (SocketException e) {
             System.out.println(e.getMessage());
         }
     }
@@ -35,12 +36,12 @@ public class Server {
         clients.set(new ArrayList<>());
     }
 
-    public void start() throws IOException {
+    public void start() throws SocketException {
         try {
             port = getPortFromResources();
             serverSocket = new ServerSocket(port);
         } catch (IOException e) {
-            throw new IOException("Не удалось открыть соединение!", e);
+            throw new SocketException("Не удалось открыть соединение!" + e.getMessage());
         }
 
         Runtime.getRuntime().addShutdownHook(new Thread(this::close));
@@ -60,13 +61,14 @@ public class Server {
     }
 
     private static int getPortFromResources() throws IOException {
-        Properties properties = new Properties();
-
         try (InputStream propertiesStream = Server.class.getResourceAsStream("/server.properties")) {
+            Properties properties = new Properties();
             if (propertiesStream != null) {
                 properties.load(propertiesStream);
             }
             return Integer.valueOf(properties.getProperty("server.port"));
+        } catch (NumberFormatException e) {
+            throw new IOException("Порт должен быть числом!", e);
         } catch (IOException e) {
             throw new IOException("Не удалось получить порт из ресурсов!", e);
         }
@@ -77,9 +79,9 @@ public class Server {
             connectionListener.interrupt();
             serverSocket.close();
             messageListener.interrupt();
-            ServerMessage message = new ServerMessage("Сервер завершил работу");
-            message.setEvent(ServerMessage.Events.CLOSE);
-            String json = Serialization.toJson(message);
+
+            String json = Serialization.toJson(new ServerMessage("Сервер завершил работу")
+                    .setEvent(ServerMessage.Events.CLOSE));
             for (Client clientItem : clients.get()) {
                 clientItem.sendMessage(json);
                 clientItem.close();
@@ -108,21 +110,13 @@ public class Server {
         boolean interrupted = false;
         while (!interrupted) {
             try {
-                Client client = null;
                 for (Client clientItem : clients.get()) {
-                    if (clientItem.ready()) {
-                        client = clientItem;
-                        break;
+                    if (clientItem.haveMessage()) {
+                        processMessage(clientItem);
                     }
                 }
-
-                if (client != null) {
-                    processMessage(client);
-                }
-
             } catch (IOException e) {
-                System.out.println("Ошибка при подключении клиента!" + System.lineSeparator() + e.getMessage());
-                System.out.println("Ошибка передачи сообщения!" + System.lineSeparator() + e.getMessage());
+                System.out.println("Ошибка обработчика сообщений!" + System.lineSeparator() + e.getMessage());
             }
 
             try {
@@ -134,7 +128,7 @@ public class Server {
     }
 
     private void processMessage(Client client) throws IOException {
-        String message = client.readLine();
+        String message = client.getMessage();
         Communication communication = Serialization.fromJson(message);
 
         if (communication.getClass().getName() == User.class.getName()) {
@@ -149,32 +143,22 @@ public class Server {
                     break;
             }
         } else if (communication.getClass().getName() == UserMessage.class.getName() && client.getActivity()) {
-
-            UserMessage userMessage = (UserMessage) communication;
-            for (Client clientItem : clients.get()) {
-                if (!userMessage.getUserName().equals(clientItem.getUserName()) && client.getActivity()) {
-                    clientItem.sendMessage(message);
-                }
-            }
+            sendAllClientsMessage(communication);
         } else {
-            client.sendMessage(Serialization.toJson(new ServerMessage("Сервер ждёт данные о пользователе (объект User)!").setEvent(ServerMessage.Events.ERROR)));
-            System.out.println("Сервер ожидал UserMessage, а пришел - " + communication.getClass().getName());
+            client.sendMessage(Serialization.toJson(new ServerMessage("Сервер не ждал данные типа " + communication.getClass().getName() + " от данного клиента!")));
         }
     }
 
     private void addClient(Client client) throws IOException {
-        List<String> userNames = getUserNames();
-
-        if (userNames.contains(client.getUserName())) {
+        if (getUserNames().contains(client.getUserName())) {
             client.sendMessage(Serialization.toJson(new ServerMessage("В чате уже существует пользователь с таким именем!").setEvent(ServerMessage.Events.ERROR)));
         } else {
             client.setActivity(true);
-            userNames.add(client.getUserName());
-            client.sendMessage(Serialization.toJson(new ServerMessage("GOOD").setEvent(ServerMessage.Events.SUCCESS)));
+            client.sendMessage(Serialization.toJson(new ServerMessage("Подключение к серверу прошло успешно!").setEvent(ServerMessage.Events.SUCCESS)));
 
             sendAllClientsMessage(new ServerMessage("В чат добавлен новый собеседник с именем " + client.getUserName())
                     .setEvent(ServerMessage.Events.UPDATE_USERS)
-                    .setUserNames(userNames));
+                    .setUserNames(getUserNames()));
         }
     }
 
@@ -186,8 +170,8 @@ public class Server {
                 .setUserNames(getUserNames()));
     }
 
-    private void sendAllClientsMessage(ServerMessage serverMessage) throws IOException {
-        String json = Serialization.toJson(serverMessage);
+    private void sendAllClientsMessage(Communication communication) throws IOException {
+        String json = Serialization.toJson(communication);
         for (Client clientItem : clients.get()) {
             if (clientItem.getActivity()) {
                 clientItem.sendMessage(json);
@@ -204,8 +188,5 @@ public class Server {
         }
         return userNames;
     }
-
-
-//TODO: ввести минутное пингование
 
 }
