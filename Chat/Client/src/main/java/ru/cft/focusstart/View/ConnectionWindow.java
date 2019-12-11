@@ -1,10 +1,13 @@
-package ru.cft.focusstart;
+package ru.cft.focusstart.View;
+
+import ru.cft.focusstart.CharsetConverter;
+import ru.cft.focusstart.Client;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 
-public class ConnectionWindow extends JFrame {
+public class ConnectionWindow extends JFrame implements ConnectionView {
 
     private JMenuBar jMenuBar;
     private JMenu jMenu;
@@ -56,13 +59,25 @@ public class ConnectionWindow extends JFrame {
         setLocationRelativeTo(null);
         setResizable(false);
         pack();
+    }
+
+    public void setDefaultAddress(String address) {
+        jtfServerAddress.setText(address);
+        jtfUserName.grabFocus();
+    }
+
+    public void showView() {
         setVisible(true);
     }
 
-    public void connect(ActionEvent e) {
+    public void hideView() {
+        setVisible(false);
+    }
+
+    private void connect(ActionEvent e) {
         if (jtfServerAddress.getText().length() > 0 && jtfUserName.getText().length() > 0) {
-            client.connect(CharsetConverter.utf8ToCp1251(jtfServerAddress.getText()), CharsetConverter.utf8ToCp1251(jtfUserName.getText()));
             setVisible(false);
+            client.connect(CharsetConverter.utf8ToCp1251(jtfServerAddress.getText()), CharsetConverter.utf8ToCp1251(jtfUserName.getText()));
         }
     }
 }
