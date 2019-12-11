@@ -1,5 +1,7 @@
 package ru.cft.focusstart;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.cft.focusstart.dto.Communication;
 import ru.cft.focusstart.dto.ServerMessage;
 import ru.cft.focusstart.dto.User;
@@ -13,6 +15,8 @@ import java.net.Socket;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Connection {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Connection.class);
+
     private String address;
     private Integer port;
     private Socket socket;
@@ -78,7 +82,7 @@ public class Connection {
             writer.get().flush();
             socket.close();
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            LOGGER.error(e.getMessage());
         }
     }
 
@@ -91,7 +95,7 @@ public class Connection {
             catch (IOException e) {
                 interrupted = Thread.currentThread().isInterrupted() || socket.isClosed();
                 if (!interrupted) {
-                    System.out.println("Ошибка при приёме сообщения!" + System.lineSeparator() + e.getMessage());
+                    LOGGER.error("Ошибка при приёме сообщения!" + System.lineSeparator() + e.getMessage());
                 }
             }
         }

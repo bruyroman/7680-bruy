@@ -1,5 +1,7 @@
 package ru.cft.focusstart;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.cft.focusstart.View.ChatView;
 import ru.cft.focusstart.View.ChatWindow;
 import ru.cft.focusstart.View.ConnectionView;
@@ -14,6 +16,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Client {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Client.class);
 
     private ConnectionView connectionView;
     private Connection connection;
@@ -105,10 +108,10 @@ public class Client {
                     }
                     break;
                 default:
-                    System.out.println("Сервер прислал неожиданное событие! (" + serverMessage.getEvent() + ")");
+                    LOGGER.info("Сервер прислал неожиданное событие! (" + serverMessage.getEvent() + ")");
             }
         } else {
-            System.out.println("Пришло неизвестное сообщение!" + System.lineSeparator() + communication.getClass().getName());
+            LOGGER.info("Пришло неизвестное сообщение!" + System.lineSeparator() + communication.getClass().getName());
         }
     }
 

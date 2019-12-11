@@ -1,5 +1,7 @@
 package ru.cft.focusstart;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.cft.focusstart.dto.Communication;
 import ru.cft.focusstart.dto.ServerMessage;
 import ru.cft.focusstart.dto.User;
@@ -17,6 +19,8 @@ import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Server {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Server.class);
+
     private ServerSocket serverSocket;
     private AtomicReference<List<Client>> clients;
     private Integer port;
@@ -27,7 +31,7 @@ public class Server {
         try {
             new Server().start();
         } catch (SocketException e) {
-            System.out.println(e.getMessage());
+            LOGGER.error(e.getMessage());
         }
     }
 
@@ -87,7 +91,7 @@ public class Server {
                 clientItem.close();
             }
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            LOGGER.error(e.getMessage());
         }
     }
 
@@ -100,7 +104,7 @@ public class Server {
             } catch (IOException e) {
                 interrupted = Thread.currentThread().isInterrupted();
                 if (!interrupted) {
-                    System.out.println("Произошла неудачная попытка подключения к серверу!" + System.lineSeparator() + e.getMessage());
+                    LOGGER.error("Произошла неудачная попытка подключения к серверу!" + System.lineSeparator() + e.getMessage());
                 }
             }
         }
@@ -122,7 +126,7 @@ public class Server {
                     processMessage(client);
                 }
             } catch (IOException e) {
-                System.out.println("Ошибка обработчика сообщений!" + System.lineSeparator() + e.getMessage());
+                LOGGER.error("Ошибка обработчика сообщений!" + System.lineSeparator() + e.getMessage());
             }
 
             try {

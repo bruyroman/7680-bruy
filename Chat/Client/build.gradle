@@ -14,4 +14,6 @@ repositories {
 dependencies {
     implementation project(":Chat:Common")
     testCompile group: 'junit', name: 'junit', version: '4.12'
+    runtime group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+    compile group: 'org.slf4j', name: 'log4j-over-slf4j', version: '1.7.25'
 }
