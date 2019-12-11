@@ -75,9 +75,7 @@ public class ConnectionWindow extends JFrame implements ConnectionView {
     }
 
     private void connect(ActionEvent e) {
-        if (jtfServerAddress.getText().length() > 0 && jtfUserName.getText().length() > 0) {
-            setVisible(false);
-            client.connect(CharsetConverter.utf8ToCp1251(jtfServerAddress.getText()), CharsetConverter.utf8ToCp1251(jtfUserName.getText()));
-        }
+        setVisible(false);
+        client.connect(CharsetConverter.utf8ToCp1251(jtfServerAddress.getText()), CharsetConverter.utf8ToCp1251(jtfUserName.getText()));
     }
 }

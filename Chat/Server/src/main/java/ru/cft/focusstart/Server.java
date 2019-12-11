@@ -160,7 +160,9 @@ public class Server {
     }
 
     private void addClient(Client client) throws IOException {
-        if (getUserNames().contains(client.getUserName())) {
+        if (client.getUserName().trim().length() == 0) {
+            client.sendMessage(Serialization.toJson(new ServerMessage("Нельзя иметь пустое имя!").setEvent(ServerMessage.Events.ERROR)));
+        } else if (getUserNames().contains(client.getUserName())) {
             client.sendMessage(Serialization.toJson(new ServerMessage("В чате уже существует пользователь с таким именем!").setEvent(ServerMessage.Events.ERROR)));
         } else {
             client.setActivity(true);

@@ -62,7 +62,7 @@ public class Connection {
                     case SUCCESS:
                         break;
                     case ERROR:
-                        throw new ConnectException("Ошибка! " + serverMessage.getMessage());
+                        throw new ConnectException(serverMessage.getMessage());
                     default:
                         throw new ConnectException("Некорректный ответ от сервера! (" + serverMessage.getEvent() + ")" + System.lineSeparator() + serverMessage.getMessage());
                 }
@@ -70,7 +70,7 @@ public class Connection {
                 throw new ConnectException("Некорректный ответ от сервера!" + System.lineSeparator() + communication.getClass().getName());
             }
         } catch (IOException e) {
-            throw new ConnectException("Сервер недоступен!" + System.lineSeparator() + e.getMessage());
+            throw new ConnectException("Сервер вернул ошибку!" + System.lineSeparator() + e.getMessage());
         }
     }
 
