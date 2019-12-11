@@ -4,11 +4,12 @@ import ru.cft.focusstart.View.ChatView;
 import ru.cft.focusstart.View.ChatWindow;
 import ru.cft.focusstart.View.ConnectionView;
 import ru.cft.focusstart.View.ConnectionWindow;
-import ru.cft.focusstart.dto.*;
+import ru.cft.focusstart.dto.Communication;
+import ru.cft.focusstart.dto.ServerMessage;
+import ru.cft.focusstart.dto.UserMessage;
 
 import java.net.ConnectException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -98,10 +99,9 @@ public class Client {
                     break;
                 case CLOSE:
                     connection.close();
-                    userNames = new ArrayList<>();
                     if (chatView.get() != null) {
                         chatView.get().addMessage(serverMessage.getMessage());
-                        chatView.get().updateUsers();
+                        chatView.get().stopChat();
                     }
                     break;
                 default:

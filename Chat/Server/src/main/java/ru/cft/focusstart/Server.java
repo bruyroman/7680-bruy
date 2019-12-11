@@ -110,10 +110,16 @@ public class Server {
         boolean interrupted = false;
         while (!interrupted) {
             try {
+                Client client = null;
                 for (Client clientItem : clients.get()) {
                     if (clientItem.haveMessage()) {
-                        processMessage(clientItem);
+                        client = clientItem;
+                        break;
                     }
+                }
+
+                if (client != null) {
+                    processMessage(client);
                 }
             } catch (IOException e) {
                 System.out.println("Ошибка обработчика сообщений!" + System.lineSeparator() + e.getMessage());

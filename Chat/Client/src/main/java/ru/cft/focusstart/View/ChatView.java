@@ -14,4 +14,5 @@ public interface ChatView {
 
     void updateUsers();
 
+    void stopChat();
 }

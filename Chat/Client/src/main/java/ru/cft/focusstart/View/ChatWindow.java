@@ -127,6 +127,13 @@ public class ChatWindow extends JFrame implements ChatView {
                 String.join(System.lineSeparator(), client.getConnectedUsers())));
     }
 
+    @Override
+    public void stopChat() {
+        jbSendMessage.setEnabled(false);
+        jtaUserMessage.setEnabled(false);
+        jtaUserMessage.setText("");
+    }
+
     private class KeyListenerUserMessage implements KeyListener {
         @Override
         public void keyTyped(KeyEvent e) {}
@@ -142,4 +149,5 @@ public class ChatWindow extends JFrame implements ChatView {
         @Override
         public void keyReleased(KeyEvent e) {}
     }
+
 }
