@@ -1,17 +1,47 @@
 package ru.cft.focusstart.dto;
 
+import java.util.List;
+
 public class ServerMessage extends Communication {
 
     private String message;
-    public ServerEvent event = ServerEvent.INFO;
+    private List<String> userNames;
+    private Events event;
 
     private ServerMessage() {}
 
     public ServerMessage(String message) {
+        event = Events.NONE;
         this.message = message;
+    }
+
+    public List<String> getUsers() {
+        return userNames;
+    }
+
+    public ServerMessage setUsers(List<String> usersName) {
+        this.userNames = usersName;
+        return this;
+    }
+
+    public Events getEvent() {
+        return event;
+    }
+
+    public ServerMessage setEvent(Events event) {
+        this.event = event;
+        return this;
     }
 
     public String getMessage() {
         return message;
+    }
+
+    public enum Events {
+        NONE,
+        SUCCESS,
+        ERROR,
+        UPDATE_USERS,
+        CLOSE
     }
 }

@@ -8,30 +8,30 @@ import ru.cft.focusstart.dto.*;
 
 import java.net.ConnectException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Client {
 
     private ConnectionView connectionView;
     private Connection connection;
-    private String userName;
     private AtomicReference<ChatView> chatView;
-    private Users users = new Users();
-
-    private User user;
+    private List<String> userNames;
+    private String userName;
 
     public static void main(String[] args) {
         new Client();
     }
 
     public Client() {
+        chatView = new AtomicReference<>();
         connectionView = new ConnectionWindow(this);
         connectionView.setDefaultAddress("localhost:1010");
         connectionView.showView();
     }
 
     public void connect(String serverAddress, String userName) {
-        user = new User(userName);
         this.userName = userName;
 
         String[] address = serverAddress.split(":");
@@ -41,32 +41,27 @@ public class Client {
             return;
         }
 
+
+
         try {
             connection = new Connection(address[0], Integer.valueOf(address[1]));
-            connection.Open(user);
+            connection.connect(this);
         } catch (NumberFormatException e) {
             System.out.println("Порт должен быть числом!" + System.lineSeparator() + e.getMessage());
             connectionView.showView();
             return;
         } catch (ConnectException e) {
-            System.out.println("Ошибка при подключении!" + System.lineSeparator() + e.getMessage());
+            System.out.println(e.getMessage());
             connectionView.showView();
             return;
         }
 
-        chatView = new AtomicReference<>();
         chatView.set(new ChatWindow(this));
-
-        connection.startMessageListener(this);
-    }
-
-    public String getMyUserName() {
-        return userName;
     }
 
     public String[] getConnectedUsers() {
-        if (users.getUsers().size() > 0) {
-            return users.getUsersName().toArray(new String[0]);
+        if (userNames != null && userNames.size() > 0) {
+            return userNames.toArray(new String[0]);
         } else {
             return new String[]{};
         }
@@ -74,25 +69,46 @@ public class Client {
 
     public void sendMessage(String message) {
         chatView.get().addMessage(userName, LocalDateTime.now(), message);
-        connection.sendCommunication(new UserMessage(user, LocalDateTime.now(), message));
+        connection.sendCommunication(new UserMessage(userName, LocalDateTime.now(), message));
     }
 
     public void acceptMessage(Communication communication) {
         if (communication.getClass().getName() == UserMessage.class.getName()) {
             UserMessage userMessage = (UserMessage) communication;
-            chatView.get().addMessage(userMessage.user.getName(), userMessage.dateTime, userMessage.message);
+            chatView.get().addMessage(userMessage.userName, userMessage.dateTime, userMessage.message);
+            User user = new User(userName);
+            user.setEvent(User.Events.SUCCESS);
+            connection.sendCommunication(user);
 
         } else if (communication.getClass().getName() == ServerMessage.class.getName()) {
             ServerMessage serverMessage = (ServerMessage) communication;
-            chatView.get().addMessage(serverMessage.getMessage());
 
-        } else if (communication.getClass().getName() == Users.class.getName()) {
-            users.setUsers(((Users) communication).getUsers());
-            chatView.get().updateUsers();
-
+            switch (serverMessage.getEvent()) {
+                case UPDATE_USERS:
+                    userNames = serverMessage.getUsers();
+                    userNames.remove(userName);
+                    if (chatView.get() != null) {
+                        chatView.get().addMessage(serverMessage.getMessage());
+                        chatView.get().updateUsers();
+                    }
+                    break;
+                case CLOSE:
+                    userNames = new ArrayList<>();
+                    if (chatView.get() != null) {
+                        chatView.get().addMessage(serverMessage.getMessage());
+                        chatView.get().updateUsers();
+                    }
+                    break;
+                default:
+                    System.out.println("Сервер прислал неожиданное событие! (" + serverMessage.getEvent() + ")");
+            }
         } else {
             System.out.println("Пришло неизвестное сообщение!" + System.lineSeparator() + communication.getClass().getName());
         }
+    }
+
+    public String getUserName() {
+        return userName;
     }
 }
 

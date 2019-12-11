@@ -1,7 +1,5 @@
 package ru.cft.focusstart;
 
-import ru.cft.focusstart.dto.User;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -12,20 +10,30 @@ public class Client {
     private Socket socket;
     private BufferedReader reader;
     private PrintWriter writer;
-    private User user;
+    private String userName;
+    private boolean activity;
 
     public Client(Socket socket) throws IOException {
         this.socket = socket;
         reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         writer = new PrintWriter(socket.getOutputStream());
+        activity = false;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
-    public BufferedReader getReader() {
-        return reader;
+    public String getUserName() {
+        return userName;
+    }
+
+    public boolean ready() throws IOException {
+        return reader.ready();
+    }
+
+    public String readLine() throws IOException {
+        return reader.readLine();
     }
 
     public void sendMessage(String message) {
@@ -35,6 +43,14 @@ public class Client {
 
     public void close() throws IOException {
         socket.close();
+    }
+
+    public void setActivity(boolean activity) {
+        this.activity = activity;
+    }
+
+    public boolean getActivity() {
+        return activity;
     }
 
 }

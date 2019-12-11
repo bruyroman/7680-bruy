@@ -122,7 +122,7 @@ public class ChatWindow extends JFrame implements ChatView {
     }
 
     public void updateUsers() {
-        jtaUsers.setText(CharsetConverter.cp1251ToUtf8("Ваше имя: " + client.getMyUserName() + System.lineSeparator() + System.lineSeparator() +
+        jtaUsers.setText(CharsetConverter.cp1251ToUtf8("Ваше имя: " + client.getUserName() + System.lineSeparator() + System.lineSeparator() +
                 "В чате присутствуют:" + System.lineSeparator() +
                 String.join(System.lineSeparator(), client.getConnectedUsers())));
     }

@@ -7,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonSubTypes({
         @JsonSubTypes.Type(value = ServerMessage.class, name = "ServerMessage"),
         @JsonSubTypes.Type(value = User.class, name = "User"),
-        @JsonSubTypes.Type(value = Users.class, name = "Users"),
         @JsonSubTypes.Type(value = UserMessage.class, name = "UserMessage")
 })
 public abstract class Communication {}
