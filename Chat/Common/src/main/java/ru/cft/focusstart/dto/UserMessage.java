@@ -6,10 +6,10 @@ import java.time.LocalDateTime;
 
 public class UserMessage extends Communication {
 
-    public String userName;
+    private String userName;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm dd.MM.yyyy")
-    public LocalDateTime dateTime;
-    public String message;
+    private LocalDateTime dateTime;
+    private String message;
 
     private UserMessage() {}
 
@@ -17,5 +17,17 @@ public class UserMessage extends Communication {
         this.userName = userName;
         this.dateTime = dateTime;
         this.message = message;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public LocalDateTime getDateTime() {
+        return dateTime;
+    }
+
+    public String getMessage() {
+        return message;
     }
 }

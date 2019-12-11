@@ -152,7 +152,7 @@ public class Server {
 
             UserMessage userMessage = (UserMessage) communication;
             for (Client clientItem : clients.get()) {
-                if (!userMessage.userName.equals(clientItem.getUserName()) && client.getActivity()) {
+                if (!userMessage.getUserName().equals(clientItem.getUserName()) && client.getActivity()) {
                     clientItem.sendMessage(message);
                 }
             }
@@ -174,16 +174,16 @@ public class Server {
 
             sendAllClientsMessage(new ServerMessage("В чат добавлен новый собеседник с именем " + client.getUserName())
                     .setEvent(ServerMessage.Events.UPDATE_USERS)
-                    .setUsers(userNames));
+                    .setUserNames(userNames));
         }
     }
 
     private void removeClient(Client client) throws IOException {
         clients.get().remove(client);
         client.close();
-        ServerMessage serverMessage = new ServerMessage("Собеседник с именем  " + client.getUserName() + " вышел из чата").setEvent(ServerMessage.Events.UPDATE_USERS);
-        serverMessage.setUsers(getUserNames());
-        sendAllClientsMessage(serverMessage);
+        sendAllClientsMessage(new ServerMessage("Собеседник с именем  " + client.getUserName() + " вышел из чата")
+                .setEvent(ServerMessage.Events.UPDATE_USERS)
+                .setUserNames(getUserNames()));
     }
 
     private void sendAllClientsMessage(ServerMessage serverMessage) throws IOException {

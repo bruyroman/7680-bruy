@@ -20,8 +20,9 @@ public class User extends Communication {
         return event;
     }
 
-    public void setEvent(Events event) {
-       this.event = event;
+    public User setEvent(Events event) {
+        this.event = event;
+        return this;
     }
 
     public enum Events {

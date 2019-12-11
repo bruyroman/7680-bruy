@@ -15,11 +15,15 @@ public class ServerMessage extends Communication {
         this.message = message;
     }
 
-    public List<String> getUsers() {
+    public String getMessage() {
+        return message;
+    }
+
+    public List<String> getUserNames() {
         return userNames;
     }
 
-    public ServerMessage setUsers(List<String> usersName) {
+    public ServerMessage setUserNames(List<String> usersName) {
         this.userNames = usersName;
         return this;
     }
@@ -31,10 +35,6 @@ public class ServerMessage extends Communication {
     public ServerMessage setEvent(Events event) {
         this.event = event;
         return this;
-    }
-
-    public String getMessage() {
-        return message;
     }
 
     public enum Events {

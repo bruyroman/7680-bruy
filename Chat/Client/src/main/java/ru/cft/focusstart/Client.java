@@ -75,7 +75,7 @@ public class Client {
     public void acceptMessage(Communication communication) {
         if (communication.getClass().getName() == UserMessage.class.getName()) {
             UserMessage userMessage = (UserMessage) communication;
-            chatView.get().addMessage(userMessage.userName, userMessage.dateTime, userMessage.message);
+            chatView.get().addMessage(userMessage.getUserName(), userMessage.getDateTime(), userMessage.getMessage());
             User user = new User(userName);
             user.setEvent(User.Events.SUCCESS);
             connection.sendCommunication(user);
@@ -85,7 +85,7 @@ public class Client {
 
             switch (serverMessage.getEvent()) {
                 case UPDATE_USERS:
-                    userNames = serverMessage.getUsers();
+                    userNames = serverMessage.getUserNames();
                     userNames.remove(userName);
                     if (chatView.get() != null) {
                         chatView.get().addMessage(serverMessage.getMessage());
