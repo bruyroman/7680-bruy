@@ -125,8 +125,7 @@ public class ChatWindow extends JFrame implements ChatView {
                 "В чате присутствуют:" + System.lineSeparator() +
                 String.join(System.lineSeparator(), client.getConnectedUsers()));
     }
-
-    @Override
+    
     public void stopChat() {
         jbSendMessage.setEnabled(false);
         jtaUserMessage.setEnabled(false);

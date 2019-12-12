@@ -70,7 +70,7 @@ public class Connection {
                 throw new ConnectException("Некорректный ответ от сервера!" + System.lineSeparator() + communication.getClass().getName());
             }
         } catch (IOException e) {
-            throw new ConnectException("Сервер вернул ошибку!" + System.lineSeparator() + e.getMessage());
+            throw new ConnectException(e.getMessage());
         }
     }
 

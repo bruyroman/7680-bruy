@@ -45,7 +45,7 @@ public class Server {
             port = getPortFromResources();
             serverSocket = new ServerSocket(port);
         } catch (IOException e) {
-            throw new SocketException("Не удалось открыть соединение!" + e.getMessage());
+            throw new SocketException("Не удалось открыть соединение! " + e.getMessage());
         }
 
         Runtime.getRuntime().addShutdownHook(new Thread(this::close));
@@ -152,7 +152,7 @@ public class Server {
                     removeClient(client);
                     break;
             }
-        } else if (communication.getClass().getName() == UserMessage.class.getName() && client.getActivity()) {
+        } else if (communication.getClass().getName() == UserMessage.class.getName() && client.isAddedToChat()) {
             sendAllClientsMessage(communication);
         } else {
             client.sendMessage(Serialization.toJson(new ServerMessage("Сервер не ждал данные типа " + communication.getClass().getName() + " от данного клиента!")));
@@ -165,7 +165,7 @@ public class Server {
         } else if (getUserNames().contains(client.getUserName())) {
             client.sendMessage(Serialization.toJson(new ServerMessage("В чате уже существует пользователь с таким именем!").setEvent(ServerMessage.Events.ERROR)));
         } else {
-            client.setActivity(true);
+            client.setAddedToChat(true);
             client.sendMessage(Serialization.toJson(new ServerMessage("Подключение к серверу прошло успешно!").setEvent(ServerMessage.Events.SUCCESS)));
 
             sendAllClientsMessage(new ServerMessage("В чат добавлен новый собеседник с именем " + client.getUserName())
@@ -185,7 +185,7 @@ public class Server {
     private void sendAllClientsMessage(Communication communication) throws IOException {
         String json = Serialization.toJson(communication);
         for (Client clientItem : clients.get()) {
-            if (clientItem.getActivity()) {
+            if (clientItem.isAddedToChat()) {
                 clientItem.sendMessage(json);
             }
         }
@@ -194,7 +194,7 @@ public class Server {
     private List<String> getUserNames() {
         List<String> userNames = new ArrayList<>();
         for (Client clientItem : clients.get()) {
-            if (clientItem.getActivity()) {
+            if (clientItem.isAddedToChat()) {
                 userNames.add(clientItem.getUserName());
             }
         }
