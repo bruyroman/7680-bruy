@@ -56,7 +56,7 @@ public class Server {
 
         Scanner input = new Scanner(System.in);
         while (true) {
-            System.out.println("Введите EXIT для завершения работы сервера:");
+            System.out.println("Enter EXIT to shutdown the server:");
             if (input.nextLine().toUpperCase().equals("EXIT")) {
                 close();
                 System.exit(0);

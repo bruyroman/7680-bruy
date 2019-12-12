@@ -1,6 +1,5 @@
 package ru.cft.focusstart.View;
 
-import ru.cft.focusstart.CharsetConverter;
 import ru.cft.focusstart.Client;
 
 import javax.swing.*;
@@ -28,10 +27,10 @@ public class ConnectionWindow extends JFrame implements ConnectionView {
         jMenuBar = new JMenuBar();
         setJMenuBar(jMenuBar);
 
-        jMenu = new JMenu(CharsetConverter.cp1251ToUtf8("Файл"));
+        jMenu = new JMenu("Файл");
         jMenuBar.add(jMenu);
 
-        jExitItem = new JMenuItem(CharsetConverter.cp1251ToUtf8("Выход"));
+        jExitItem = new JMenuItem("Выход");
         jExitItem.addActionListener(e -> System.exit(0));
         jMenu.add(jExitItem);
 
@@ -39,20 +38,20 @@ public class ConnectionWindow extends JFrame implements ConnectionView {
         jPanel.setLayout(new GridLayout(2, 2));
         add(jPanel);
 
-        jlServerAddress = new JLabel(CharsetConverter.cp1251ToUtf8("Введите адрес сервера "));
+        jlServerAddress = new JLabel("Введите адрес сервера ");
         jPanel.add(jlServerAddress);
 
         jtfServerAddress = new JTextField();
         jPanel.add(jtfServerAddress);
 
-        jlUserName = new JLabel(CharsetConverter.cp1251ToUtf8("Введите имя пользователя "));
+        jlUserName = new JLabel("Введите имя пользователя ");
         jPanel.add(jlUserName);
 
         jtfUserName = new JTextField();
         jPanel.add(jtfUserName);
 
         jbConnect = new JButton();
-        jbConnect.setText(CharsetConverter.cp1251ToUtf8("Подключиться"));
+        jbConnect.setText("Подключиться");
         jbConnect.addActionListener(this::connect);
         add(jbConnect);
 
@@ -76,6 +75,6 @@ public class ConnectionWindow extends JFrame implements ConnectionView {
 
     private void connect(ActionEvent e) {
         setVisible(false);
-        client.connect(CharsetConverter.utf8ToCp1251(jtfServerAddress.getText()), CharsetConverter.utf8ToCp1251(jtfUserName.getText()));
+        client.connect(jtfServerAddress.getText(), jtfUserName.getText());
     }
 }
