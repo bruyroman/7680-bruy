@@ -7,6 +7,9 @@ version 'unspecified'
 
 sourceCompatibility = 1.8
 
+compileJava.options.encoding = "UTF-8"
+compileTestJava.options.encoding = "UTF-8"
+
 repositories {
     mavenCentral()
 }
@@ -14,4 +17,6 @@ repositories {
 dependencies {
     implementation project(":Chat:Common")
     testCompile group: 'junit', name: 'junit', version: '4.12'
+    runtime group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+    compile group: 'org.slf4j', name: 'log4j-over-slf4j', version: '1.7.25'
 }

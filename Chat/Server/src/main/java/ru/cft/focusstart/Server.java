@@ -1,5 +1,7 @@
 package ru.cft.focusstart;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.cft.focusstart.dto.Communication;
 import ru.cft.focusstart.dto.ServerMessage;
 import ru.cft.focusstart.dto.User;
@@ -17,6 +19,8 @@ import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Server {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Server.class);
+
     private ServerSocket serverSocket;
     private AtomicReference<List<Client>> clients;
     private Integer port;
@@ -27,7 +31,7 @@ public class Server {
         try {
             new Server().start();
         } catch (SocketException e) {
-            System.out.println(e.getMessage());
+            LOGGER.error(e.getMessage());
         }
     }
 
@@ -41,7 +45,7 @@ public class Server {
             port = getPortFromResources();
             serverSocket = new ServerSocket(port);
         } catch (IOException e) {
-            throw new SocketException("Не удалось открыть соединение!" + e.getMessage());
+            throw new SocketException("Не удалось открыть соединение! " + e.getMessage());
         }
 
         Runtime.getRuntime().addShutdownHook(new Thread(this::close));
@@ -52,7 +56,7 @@ public class Server {
 
         Scanner input = new Scanner(System.in);
         while (true) {
-            System.out.println("Введите EXIT для завершения работы сервера:");
+            System.out.println("Enter EXIT to shutdown the server:");
             if (input.nextLine().toUpperCase().equals("EXIT")) {
                 close();
                 System.exit(0);
@@ -87,7 +91,7 @@ public class Server {
                 clientItem.close();
             }
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            LOGGER.error(e.getMessage());
         }
     }
 
@@ -100,7 +104,7 @@ public class Server {
             } catch (IOException e) {
                 interrupted = Thread.currentThread().isInterrupted();
                 if (!interrupted) {
-                    System.out.println("Произошла неудачная попытка подключения к серверу!" + System.lineSeparator() + e.getMessage());
+                    LOGGER.error("Произошла неудачная попытка подключения к серверу!" + System.lineSeparator() + e.getMessage());
                 }
             }
         }
@@ -110,13 +114,19 @@ public class Server {
         boolean interrupted = false;
         while (!interrupted) {
             try {
+                Client client = null;
                 for (Client clientItem : clients.get()) {
                     if (clientItem.haveMessage()) {
-                        processMessage(clientItem);
+                        client = clientItem;
+                        break;
                     }
                 }
+
+                if (client != null) {
+                    processMessage(client);
+                }
             } catch (IOException e) {
-                System.out.println("Ошибка обработчика сообщений!" + System.lineSeparator() + e.getMessage());
+                LOGGER.error("Ошибка обработчика сообщений!" + System.lineSeparator() + e.getMessage());
             }
 
             try {
@@ -142,7 +152,7 @@ public class Server {
                     removeClient(client);
                     break;
             }
-        } else if (communication.getClass().getName() == UserMessage.class.getName() && client.getActivity()) {
+        } else if (communication.getClass().getName() == UserMessage.class.getName() && client.isAddedToChat()) {
             sendAllClientsMessage(communication);
         } else {
             client.sendMessage(Serialization.toJson(new ServerMessage("Сервер не ждал данные типа " + communication.getClass().getName() + " от данного клиента!")));
@@ -150,10 +160,12 @@ public class Server {
     }
 
     private void addClient(Client client) throws IOException {
-        if (getUserNames().contains(client.getUserName())) {
+        if (client.getUserName().trim().length() == 0) {
+            client.sendMessage(Serialization.toJson(new ServerMessage("Нельзя иметь пустое имя!").setEvent(ServerMessage.Events.ERROR)));
+        } else if (getUserNames().contains(client.getUserName())) {
             client.sendMessage(Serialization.toJson(new ServerMessage("В чате уже существует пользователь с таким именем!").setEvent(ServerMessage.Events.ERROR)));
         } else {
-            client.setActivity(true);
+            client.setAddedToChat(true);
             client.sendMessage(Serialization.toJson(new ServerMessage("Подключение к серверу прошло успешно!").setEvent(ServerMessage.Events.SUCCESS)));
 
             sendAllClientsMessage(new ServerMessage("В чат добавлен новый собеседник с именем " + client.getUserName())
@@ -173,7 +185,7 @@ public class Server {
     private void sendAllClientsMessage(Communication communication) throws IOException {
         String json = Serialization.toJson(communication);
         for (Client clientItem : clients.get()) {
-            if (clientItem.getActivity()) {
+            if (clientItem.isAddedToChat()) {
                 clientItem.sendMessage(json);
             }
         }
@@ -182,7 +194,7 @@ public class Server {
     private List<String> getUserNames() {
         List<String> userNames = new ArrayList<>();
         for (Client clientItem : clients.get()) {
-            if (clientItem.getActivity()) {
+            if (clientItem.isAddedToChat()) {
                 userNames.add(clientItem.getUserName());
             }
         }

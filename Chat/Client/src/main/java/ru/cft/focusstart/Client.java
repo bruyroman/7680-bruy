@@ -1,22 +1,24 @@
 package ru.cft.focusstart;
 
-import ru.cft.focusstart.View.ChatView;
-import ru.cft.focusstart.View.ChatWindow;
-import ru.cft.focusstart.View.ConnectionView;
-import ru.cft.focusstart.View.ConnectionWindow;
-import ru.cft.focusstart.dto.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import ru.cft.focusstart.View.*;
+import ru.cft.focusstart.dto.Communication;
+import ru.cft.focusstart.dto.ServerMessage;
+import ru.cft.focusstart.dto.UserMessage;
 
 import java.net.ConnectException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Client {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Client.class);
 
     private ConnectionView connectionView;
     private Connection connection;
     private AtomicReference<ChatView> chatView;
+    private InfoView infoView;
     private List<String> userNames;
     private String userName;
 
@@ -26,6 +28,7 @@ public class Client {
 
     public Client() {
         chatView = new AtomicReference<>();
+        infoView = new InfoWindow();
         connectionView = new ConnectionWindow(this);
         connectionView.setDefaultAddress("localhost:1010");
         connectionView.showView();
@@ -34,7 +37,7 @@ public class Client {
     public void connect(String serverAddress, String userName) {
         String[] address = serverAddress.split(":");
         if (address.length != 2) {
-            System.out.println("Неверно введён адрес сервера!");
+            infoView.showDialog("Неверно введён адрес сервера!");
             connectionView.showView();
             return;
         }
@@ -45,15 +48,16 @@ public class Client {
             connection = new Connection(address[0], Integer.valueOf(address[1]));
             connection.connect(this);
         } catch (NumberFormatException e) {
-            System.out.println("Порт должен быть числом!" + System.lineSeparator() + e.getMessage());
+            infoView.showDialog("Порт должен быть числом!" + System.lineSeparator() + e.getMessage());
             connectionView.showView();
             return;
         } catch (ConnectException e) {
-            System.out.println(e.getMessage());
+            infoView.showDialog(e.getMessage());
             connectionView.showView();
             return;
         }
 
+        connectionView = null;
         chatView.set(new ChatWindow(this));
     }
 
@@ -74,7 +78,7 @@ public class Client {
         try {
             connection.sendCommunication(new UserMessage(userName, LocalDateTime.now(), message));
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            infoView.showDialog(e.getMessage());
         }
     }
 
@@ -98,17 +102,16 @@ public class Client {
                     break;
                 case CLOSE:
                     connection.close();
-                    userNames = new ArrayList<>();
                     if (chatView.get() != null) {
                         chatView.get().addMessage(serverMessage.getMessage());
-                        chatView.get().updateUsers();
+                        chatView.get().stopChat();
                     }
                     break;
                 default:
-                    System.out.println("Сервер прислал неожиданное событие! (" + serverMessage.getEvent() + ")");
+                    LOGGER.info("Сервер прислал неожиданное событие! (" + serverMessage.getEvent() + ")");
             }
         } else {
-            System.out.println("Пришло неизвестное сообщение!" + System.lineSeparator() + communication.getClass().getName());
+            LOGGER.info("Пришло неизвестное сообщение!" + System.lineSeparator() + communication.getClass().getName());
         }
     }
 

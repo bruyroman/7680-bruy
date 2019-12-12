@@ -11,13 +11,13 @@ public class Client {
     private BufferedReader reader;
     private PrintWriter writer;
     private String userName;
-    private boolean activity;
+    private boolean addedToChat;
 
     public Client(Socket socket) throws IOException {
         this.socket = socket;
         reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         writer = new PrintWriter(socket.getOutputStream());
-        activity = false;
+        addedToChat = false;
     }
 
     public void setUserName(String userName) {
@@ -45,12 +45,12 @@ public class Client {
         socket.close();
     }
 
-    public void setActivity(boolean activity) {
-        this.activity = activity;
+    public void setAddedToChat(boolean value) {
+        this.addedToChat = value;
     }
 
-    public boolean getActivity() {
-        return activity;
+    public boolean isAddedToChat() {
+        return addedToChat;
     }
 
 }

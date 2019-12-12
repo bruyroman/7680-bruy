@@ -1,6 +1,5 @@
 package ru.cft.focusstart.View;
 
-import ru.cft.focusstart.CharsetConverter;
 import ru.cft.focusstart.Client;
 
 import javax.swing.*;
@@ -30,7 +29,7 @@ public class ChatWindow extends JFrame implements ChatView {
         dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm dd.MM.yy");
 
         //Настройки окна
-        setTitle(CharsetConverter.cp1251ToUtf8("Чат"));
+        setTitle("Чат");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setSize(1000, 700);
         setLayout(new BorderLayout(10, 10));
@@ -81,7 +80,7 @@ public class ChatWindow extends JFrame implements ChatView {
 
         //Кнопак отправить сообщение
         jbSendMessage = new JButton();
-        jbSendMessage.setText(CharsetConverter.cp1251ToUtf8("Отправить"));
+        jbSendMessage.setText("Отправить");
         jbSendMessage.setPreferredSize(new Dimension(150, 70));
         jbSendMessage.addActionListener(this::sendMessage);
         jPanelEnd.add(jbSendMessage, BorderLayout.LINE_END);
@@ -106,7 +105,7 @@ public class ChatWindow extends JFrame implements ChatView {
 
     private void sendMessage() {
         if (jtaUserMessage.getText().trim().length() != 0) {
-            client.sendMessage(CharsetConverter.utf8ToCp1251(jtaUserMessage.getText()).trim());
+            client.sendMessage(jtaUserMessage.getText().trim());
             jtaUserMessage.setText("");
             jtaUserMessage.setCaretPosition(0);
         }
@@ -118,13 +117,19 @@ public class ChatWindow extends JFrame implements ChatView {
     }
 
     public void addMessage(String message) {
-        jtaMessages.append(CharsetConverter.cp1251ToUtf8(message + System.lineSeparator() + System.lineSeparator()));
+        jtaMessages.append(message + System.lineSeparator() + System.lineSeparator());
     }
 
     public void updateUsers() {
-        jtaUsers.setText(CharsetConverter.cp1251ToUtf8("Ваше имя: " + client.getUserName() + System.lineSeparator() + System.lineSeparator() +
+        jtaUsers.setText("Ваше имя: " + client.getUserName() + System.lineSeparator() + System.lineSeparator() +
                 "В чате присутствуют:" + System.lineSeparator() +
-                String.join(System.lineSeparator(), client.getConnectedUsers())));
+                String.join(System.lineSeparator(), client.getConnectedUsers()));
+    }
+    
+    public void stopChat() {
+        jbSendMessage.setEnabled(false);
+        jtaUserMessage.setEnabled(false);
+        jtaUserMessage.setText("");
     }
 
     private class KeyListenerUserMessage implements KeyListener {
@@ -142,4 +147,5 @@ public class ChatWindow extends JFrame implements ChatView {
         @Override
         public void keyReleased(KeyEvent e) {}
     }
+
 }
