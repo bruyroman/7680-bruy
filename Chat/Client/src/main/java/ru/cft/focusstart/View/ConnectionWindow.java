@@ -1,10 +1,12 @@
-package ru.cft.focusstart;
+package ru.cft.focusstart.View;
+
+import ru.cft.focusstart.Client;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 
-public class ConnectionWindow extends JFrame {
+public class ConnectionWindow extends JFrame implements ConnectionView {
 
     private JMenuBar jMenuBar;
     private JMenu jMenu;
@@ -25,10 +27,10 @@ public class ConnectionWindow extends JFrame {
         jMenuBar = new JMenuBar();
         setJMenuBar(jMenuBar);
 
-        jMenu = new JMenu(CharsetConverter.cp1251ToUtf8("Файл"));
+        jMenu = new JMenu("Файл");
         jMenuBar.add(jMenu);
 
-        jExitItem = new JMenuItem(CharsetConverter.cp1251ToUtf8("Выход"));
+        jExitItem = new JMenuItem("Выход");
         jExitItem.addActionListener(e -> System.exit(0));
         jMenu.add(jExitItem);
 
@@ -36,33 +38,43 @@ public class ConnectionWindow extends JFrame {
         jPanel.setLayout(new GridLayout(2, 2));
         add(jPanel);
 
-        jlServerAddress = new JLabel(CharsetConverter.cp1251ToUtf8("Введите адрес сервера "));
+        jlServerAddress = new JLabel("Введите адрес сервера ");
         jPanel.add(jlServerAddress);
 
         jtfServerAddress = new JTextField();
         jPanel.add(jtfServerAddress);
 
-        jlUserName = new JLabel(CharsetConverter.cp1251ToUtf8("Введите имя пользователя "));
+        jlUserName = new JLabel("Введите имя пользователя ");
         jPanel.add(jlUserName);
 
         jtfUserName = new JTextField();
         jPanel.add(jtfUserName);
 
         jbConnect = new JButton();
-        jbConnect.setText(CharsetConverter.cp1251ToUtf8("Подключиться"));
+        jbConnect.setText("Подключиться");
         jbConnect.addActionListener(this::connect);
         add(jbConnect);
 
         setLocationRelativeTo(null);
         setResizable(false);
         pack();
+    }
+
+    public void setDefaultAddress(String address) {
+        jtfServerAddress.setText(address);
+        jtfUserName.grabFocus();
+    }
+
+    public void showView() {
         setVisible(true);
     }
 
-    public void connect(ActionEvent e) {
-        if (jtfServerAddress.getText().length() > 0 && jtfUserName.getText().length() > 0) {
-            client.connect(CharsetConverter.utf8ToCp1251(jtfServerAddress.getText()), CharsetConverter.utf8ToCp1251(jtfUserName.getText()));
-            setVisible(false);
-        }
+    public void hideView() {
+        setVisible(false);
+    }
+
+    private void connect(ActionEvent e) {
+        setVisible(false);
+        client.connect(jtfServerAddress.getText(), jtfUserName.getText());
     }
 }
