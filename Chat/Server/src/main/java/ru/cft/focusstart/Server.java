@@ -20,14 +20,13 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class Server {
     private static final Logger LOGGER = LoggerFactory.getLogger(Server.class);
-    private static final long MILLISECOND_CLIENT_POLLING_INTERVAL = 15000;
 
     private ServerSocket serverSocket;
     private AtomicReference<List<Client>> clients;
     private Integer port;
     private Thread messageListener;
     private Thread connectionListener;
-    private Thread clientsSurvey;
+    private Thread exclusionMissingClients;
 
     public static void main(String[] args) {
         try {
@@ -53,8 +52,8 @@ public class Server {
         Runtime.getRuntime().addShutdownHook(new Thread(this::close));
         messageListener = new Thread(this::runMessageListener);
         messageListener.start();
-        clientsSurvey = new Thread(this::runClientsSurvey);
-        clientsSurvey.start();
+        exclusionMissingClients = new Thread(this::runExclusionMissingClients);
+        exclusionMissingClients.start();
         connectionListener = new Thread(this::runConnectionListener);
         connectionListener.start();
 
@@ -87,7 +86,7 @@ public class Server {
             connectionListener.interrupt();
             serverSocket.close();
             messageListener.interrupt();
-            clientsSurvey.interrupt();
+            exclusionMissingClients.interrupt();
 
             String json = Serialization.toJson(new ServerMessage("Сервер завершил работу")
                     .setEvent(ServerMessage.Events.CLOSE));
@@ -115,7 +114,7 @@ public class Server {
         }
     }
 
-    private void runClientsSurvey() {
+    private void runExclusionMissingClients() {
         boolean interrupted = false;
         while (!interrupted) {
             try {
@@ -128,9 +127,20 @@ public class Server {
             }
 
             try {
-                Thread.sleep(MILLISECOND_CLIENT_POLLING_INTERVAL);
+                Thread.sleep(Client.MILLISECOND_POLLING_INTERVAL);
             } catch (InterruptedException e) {
                 interrupted = true;
+            }
+
+            List<Client> excludedClients = new ArrayList<>();
+            for (Client clientItem : clients.get()) {
+                if (clientItem.getInactiveTimeInMilliseconds() > Client.MILLISECOND_ALLOWABLE_INACTIVITY_INTERVAL) {
+                    excludedClients.add(clientItem);
+                }
+            }
+
+            for (Client clientItem : excludedClients) {
+                removeClient(clientItem);
             }
         }
     }
@@ -199,12 +209,18 @@ public class Server {
         }
     }
 
-    private void removeClient(Client client) throws IOException {
-        clients.get().remove(client);
-        client.close();
-        sendAllClientsMessage(new ServerMessage("Собеседник с именем  " + client.getUserName() + " вышел из чата")
-                .setEvent(ServerMessage.Events.UPDATE_USERS)
-                .setUserNames(getUserNames()));
+    private void removeClient(Client client) {
+        try {
+            clients.get().remove(client);
+            client.sendMessage(Serialization.toJson(new ServerMessage("Вы исключены из чата")
+                    .setEvent(ServerMessage.Events.CLOSE)));
+            client.close();
+            sendAllClientsMessage(new ServerMessage("Собеседник с именем  " + client.getUserName() + " вышел из чата")
+                    .setEvent(ServerMessage.Events.UPDATE_USERS)
+                    .setUserNames(getUserNames()));
+        } catch (IOException e) {
+            LOGGER.error("Удаление клиента с именем \"" + client.getUserName() + "\" не удалось!");
+        }
     }
 
     private void sendAllClientsMessage(Communication communication) throws IOException {
