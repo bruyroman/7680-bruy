@@ -2,7 +2,7 @@ package ru.cft.focusstart.dto;
 
 import java.util.List;
 
-public class ServerMessage extends Communication {
+public class ServerMessage extends Message {
 
     private String message;
     private List<String> userNames;

@@ -1,6 +1,6 @@
 package ru.cft.focusstart.dto;
 
-public class User extends Communication {
+public class User extends Message {
 
     private String name;
     private Events event;

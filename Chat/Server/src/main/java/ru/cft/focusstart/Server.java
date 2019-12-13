@@ -2,7 +2,7 @@ package ru.cft.focusstart;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.cft.focusstart.dto.Communication;
+import ru.cft.focusstart.dto.Message;
 import ru.cft.focusstart.dto.ServerMessage;
 import ru.cft.focusstart.dto.User;
 import ru.cft.focusstart.dto.UserMessage;
@@ -173,11 +173,10 @@ public class Server {
     }
 
     private void processMessage(Client client) throws IOException {
-        String message = client.getMessage();
-        Communication communication = Serialization.fromJson(message);
+        Message message = Serialization.fromJson(client.getMessage());
 
-        if (communication.getClass().getName() == User.class.getName()) {
-            User user = (User) communication;
+        if (message.getClass().getName() == User.class.getName()) {
+            User user = (User) message;
             switch (user.getEvent()) {
                 case JOINING:
                     client.setUserName(user.getName());
@@ -187,10 +186,10 @@ public class Server {
                     removeClient(client);
                     break;
             }
-        } else if (communication.getClass().getName() == UserMessage.class.getName() && client.isAddedToChat()) {
-            sendAllClientsMessage(communication);
+        } else if (message.getClass().getName() == UserMessage.class.getName() && client.isAddedToChat()) {
+            sendAllClientsMessage(message);
         } else {
-            client.sendMessage(Serialization.toJson(new ServerMessage("Сервер не ждал данные типа " + communication.getClass().getName() + " от данного клиента!")));
+            client.sendMessage(Serialization.toJson(new ServerMessage("Сервер не ждал данные типа " + message.getClass().getName() + " от данного клиента!")));
         }
     }
 
@@ -225,8 +224,8 @@ public class Server {
         }
     }
 
-    private void sendAllClientsMessage(Communication communication) throws IOException {
-        String json = Serialization.toJson(communication);
+    private void sendAllClientsMessage(Message message) throws IOException {
+        String json = Serialization.toJson(message);
         for (Client clientItem : clients.get()) {
             if (clientItem.isAddedToChat()) {
                 clientItem.sendMessage(json);

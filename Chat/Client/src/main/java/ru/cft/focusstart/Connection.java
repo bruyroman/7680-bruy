@@ -2,7 +2,7 @@ package ru.cft.focusstart;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.cft.focusstart.dto.Communication;
+import ru.cft.focusstart.dto.Message;
 import ru.cft.focusstart.dto.ServerMessage;
 import ru.cft.focusstart.dto.User;
 
@@ -64,10 +64,10 @@ public class Connection {
                     .setEvent(User.Events.JOINING)));
             writer.get().flush();
 
-            Communication communication = Serialization.fromJson(reader.readLine());
+            Message message = Serialization.fromJson(reader.readLine());
 
-            if (communication.getClass().getName() == ServerMessage.class.getName()) {
-                ServerMessage serverMessage = (ServerMessage) communication;
+            if (message.getClass().getName() == ServerMessage.class.getName()) {
+                ServerMessage serverMessage = (ServerMessage) message;
                 switch (serverMessage.getEvent()) {
                     case SUCCESS:
                         break;
@@ -77,7 +77,7 @@ public class Connection {
                         throw new ConnectException("Некорректный ответ от сервера! (" + serverMessage.getEvent() + ")" + System.lineSeparator() + serverMessage.getMessage());
                 }
             } else {
-                throw new ConnectException("Некорректный ответ от сервера!" + System.lineSeparator() + communication.getClass().getName());
+                throw new ConnectException("Некорректный ответ от сервера!" + System.lineSeparator() + message.getClass().getName());
             }
         } catch (IOException e) {
             throw new ConnectException(e.getMessage());
@@ -133,9 +133,9 @@ public class Connection {
         }
     }
 
-    public void sendCommunication(Communication communication) {
+    public void sendMessage(Message message) {
         try {
-            writer.get().println(Serialization.toJson(communication));
+            writer.get().println(Serialization.toJson(message));
             writer.get().flush();
         } catch (IOException e) {
             LOGGER.error("Ошибка при отправке сообщения!" + System.lineSeparator() + e.getMessage());
