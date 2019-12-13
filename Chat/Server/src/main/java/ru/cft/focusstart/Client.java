@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 
 public class Client {
     public static final long MILLISECOND_POLLING_INTERVAL = 5000;
-    public static final long  MILLISECOND_ALLOWABLE_INACTIVITY_INTERVAL = 15000;
+    public static final long MILLISECOND_ALLOWABLE_INACTIVITY_INTERVAL = 15000;
 
     private Socket socket;
     private BufferedReader reader;
@@ -30,7 +30,7 @@ public class Client {
     private void resetInactivity() {
         lastActivity = LocalDateTime.now();
     }
-    
+
     public void setUserName(String userName) {
         this.userName = userName;
     }

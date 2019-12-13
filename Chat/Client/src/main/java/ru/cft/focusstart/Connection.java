@@ -64,7 +64,6 @@ public class Connection {
             writer.get().flush();
 
             Message message = Serialization.fromJson(reader.readLine());
-
             if (message.getClass().getName() == ServerMessage.class.getName()) {
                 ServerMessage serverMessage = (ServerMessage) message;
                 switch (serverMessage.getEvent()) {
@@ -100,8 +99,7 @@ public class Connection {
             try {
                 client.acceptMessage(Serialization.fromJson(reader.readLine()));
                 lastActivityServer.set(LocalDateTime.now());
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 interrupted = Thread.currentThread().isInterrupted() || socket.isClosed();
                 if (!interrupted) {
                     LOGGER.error("Ошибка при приёме сообщения!" + System.lineSeparator() + e.getMessage());

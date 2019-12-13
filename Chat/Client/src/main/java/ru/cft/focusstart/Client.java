@@ -8,7 +8,6 @@ import ru.cft.focusstart.dto.ServerMessage;
 import ru.cft.focusstart.dto.UserMessage;
 
 import java.net.ConnectException;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -74,9 +73,10 @@ public class Client {
     }
 
     public void sendMessage(String message) {
-        chatView.get().addMessage(userName, LocalDateTime.now(), message);
+        UserMessage userMessage = new UserMessage(userName, message, UserMessage.Events.CHAT_MESSAGE);
+        chatView.get().addMessage(userName, userMessage.getDateTime(), message);
         try {
-            connection.sendMessage(new UserMessage(userName, message, UserMessage.Events.CHAT_MESSAGE));
+            connection.sendMessage(userMessage);
         } catch (Exception e) {
             infoView.showDialog(e.getMessage());
         }

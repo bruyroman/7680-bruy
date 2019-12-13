@@ -197,12 +197,13 @@ public class Server {
     private void addClient(Client client) throws IOException {
         if (client.getUserName().trim().length() == 0) {
             client.sendMessage(Serialization.toJson(new ServerMessage("Нельзя иметь пустое имя!", ServerMessage.Events.JOINING_ERROR)));
+
         } else if (getUserNames().contains(client.getUserName())) {
             client.sendMessage(Serialization.toJson(new ServerMessage("В чате уже существует пользователь с таким именем!", ServerMessage.Events.JOINING_ERROR)));
+
         } else {
             client.setAddedToChat(true);
             client.sendMessage(Serialization.toJson(new ServerMessage("Подключение к серверу прошло успешно!", ServerMessage.Events.JOINING_SUCCESS)));
-
             sendAllClientsMessage(new ServerMessage("В чат добавлен новый собеседник с именем " + client.getUserName(), ServerMessage.Events.UPDATE_USERS)
                     .setUserNames(getUserNames()));
         }
