@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.cft.focusstart.dto.Message;
 import ru.cft.focusstart.dto.ServerMessage;
-import ru.cft.focusstart.dto.User;
 import ru.cft.focusstart.dto.UserMessage;
 
 import java.io.IOException;
@@ -175,19 +174,22 @@ public class Server {
     private void processMessage(Client client) throws IOException {
         Message message = Serialization.fromJson(client.getMessage());
 
-        if (message.getClass().getName() == User.class.getName()) {
-            User user = (User) message;
-            switch (user.getEvent()) {
+        if (message.getClass().getName() == UserMessage.class.getName()) {
+            UserMessage userMessage = (UserMessage) message;
+            switch (userMessage.getEvent()) {
                 case JOINING:
-                    client.setUserName(user.getName());
+                    client.setUserName(userMessage.getUserName());
                     addClient(client);
+                    break;
+                case CHAT_MESSAGE:
+                    if (client.isAddedToChat()) {
+                        sendAllClientsMessage(message);
+                    }
                     break;
                 case CLOSE:
                     removeClient(client);
                     break;
             }
-        } else if (message.getClass().getName() == UserMessage.class.getName() && client.isAddedToChat()) {
-            sendAllClientsMessage(message);
         } else {
             client.sendMessage(Serialization.toJson(new ServerMessage("Сервер не ждал данные типа " + message.getClass().getName() + " от данного клиента!")));
         }

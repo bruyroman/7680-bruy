@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.cft.focusstart.dto.Message;
 import ru.cft.focusstart.dto.ServerMessage;
-import ru.cft.focusstart.dto.User;
+import ru.cft.focusstart.dto.UserMessage;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -60,8 +60,7 @@ public class Connection {
 
     private void joiningUser() throws ConnectException {
         try {
-            writer.get().println(Serialization.toJson(new User(client.getUserName())
-                    .setEvent(User.Events.JOINING)));
+            writer.get().println(Serialization.toJson(new UserMessage(client.getUserName(), UserMessage.Events.JOINING)));
             writer.get().flush();
 
             Message message = Serialization.fromJson(reader.readLine());
@@ -87,8 +86,7 @@ public class Connection {
     public void close() {
         try {
             messageListener.interrupt();
-            writer.get().println(Serialization.toJson(new User(client.getUserName())
-                    .setEvent(User.Events.CLOSE)));
+            writer.get().println(Serialization.toJson(new UserMessage(client.getUserName(), UserMessage.Events.CLOSE)));
             writer.get().flush();
             socket.close();
         } catch (IOException e) {

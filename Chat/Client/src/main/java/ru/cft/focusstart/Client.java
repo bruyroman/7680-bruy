@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import ru.cft.focusstart.View.*;
 import ru.cft.focusstart.dto.Message;
 import ru.cft.focusstart.dto.ServerMessage;
-import ru.cft.focusstart.dto.User;
 import ru.cft.focusstart.dto.UserMessage;
 
 import java.net.ConnectException;
@@ -77,7 +76,7 @@ public class Client {
     public void sendMessage(String message) {
         chatView.get().addMessage(userName, LocalDateTime.now(), message);
         try {
-            connection.sendMessage(new UserMessage(userName, LocalDateTime.now(), message));
+            connection.sendMessage(new UserMessage(userName, message, UserMessage.Events.CHAT_MESSAGE));
         } catch (Exception e) {
             infoView.showDialog(e.getMessage());
         }
@@ -109,7 +108,7 @@ public class Client {
                     }
                     break;
                 case PRESENCE_SURVEY:
-                    connection.sendMessage(new User(userName));
+                    connection.sendMessage(new UserMessage(userName, UserMessage.Events.ACTIVITY_CONFIRMATION));
                     break;
                 default:
                     LOGGER.info("Сервер прислал неожиданное событие! (" + serverMessage.getEvent() + ")");
