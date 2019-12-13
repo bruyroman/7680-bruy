@@ -2,9 +2,8 @@ package ru.cft.focusstart;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.cft.focusstart.dto.Communication;
+import ru.cft.focusstart.dto.Message;
 import ru.cft.focusstart.dto.ServerMessage;
-import ru.cft.focusstart.dto.User;
 import ru.cft.focusstart.dto.UserMessage;
 
 import java.io.IOException;
@@ -88,8 +87,7 @@ public class Server {
             messageListener.interrupt();
             exclusionMissingClients.interrupt();
 
-            String json = Serialization.toJson(new ServerMessage("Сервер завершил работу")
-                    .setEvent(ServerMessage.Events.CLOSE));
+            String json = Serialization.toJson(new ServerMessage("Сервер завершил работу", ServerMessage.Events.CLOSE));
             for (Client clientItem : clients.get()) {
                 clientItem.sendMessage(json);
                 clientItem.close();
@@ -118,7 +116,7 @@ public class Server {
         boolean interrupted = false;
         while (!interrupted) {
             try {
-                sendAllClientsMessage(new ServerMessage("Опрос о присутствии").setEvent(ServerMessage.Events.PRESENCE_SURVEY));
+                sendAllClientsMessage(new ServerMessage("Опрос о присутствии", ServerMessage.Events.PRESENCE_SURVEY));
             } catch (IOException e) {
                 interrupted = Thread.currentThread().isInterrupted();
                 if (!interrupted) {
@@ -173,38 +171,40 @@ public class Server {
     }
 
     private void processMessage(Client client) throws IOException {
-        String message = client.getMessage();
-        Communication communication = Serialization.fromJson(message);
+        Message message = Serialization.fromJson(client.getMessage());
 
-        if (communication.getClass().getName() == User.class.getName()) {
-            User user = (User) communication;
-            switch (user.getEvent()) {
+        if (message.getClass().getName() == UserMessage.class.getName()) {
+            UserMessage userMessage = (UserMessage) message;
+            switch (userMessage.getEvent()) {
                 case JOINING:
-                    client.setUserName(user.getName());
+                    client.setUserName(userMessage.getUserName());
                     addClient(client);
+                    break;
+                case CHAT_MESSAGE:
+                    if (client.isAddedToChat()) {
+                        sendAllClientsMessage(message);
+                    }
                     break;
                 case CLOSE:
                     removeClient(client);
                     break;
             }
-        } else if (communication.getClass().getName() == UserMessage.class.getName() && client.isAddedToChat()) {
-            sendAllClientsMessage(communication);
         } else {
-            client.sendMessage(Serialization.toJson(new ServerMessage("Сервер не ждал данные типа " + communication.getClass().getName() + " от данного клиента!")));
+            client.sendMessage(Serialization.toJson(new ServerMessage("Сервер не ждал данные типа " + message.getClass().getName() + " от данного клиента!", ServerMessage.Events.ERROR)));
         }
     }
 
     private void addClient(Client client) throws IOException {
         if (client.getUserName().trim().length() == 0) {
-            client.sendMessage(Serialization.toJson(new ServerMessage("Нельзя иметь пустое имя!").setEvent(ServerMessage.Events.ERROR)));
+            client.sendMessage(Serialization.toJson(new ServerMessage("Нельзя иметь пустое имя!", ServerMessage.Events.JOINING_ERROR)));
+
         } else if (getUserNames().contains(client.getUserName())) {
-            client.sendMessage(Serialization.toJson(new ServerMessage("В чате уже существует пользователь с таким именем!").setEvent(ServerMessage.Events.ERROR)));
+            client.sendMessage(Serialization.toJson(new ServerMessage("В чате уже существует пользователь с таким именем!", ServerMessage.Events.JOINING_ERROR)));
+
         } else {
             client.setAddedToChat(true);
-            client.sendMessage(Serialization.toJson(new ServerMessage("Подключение к серверу прошло успешно!").setEvent(ServerMessage.Events.SUCCESS)));
-
-            sendAllClientsMessage(new ServerMessage("В чат добавлен новый собеседник с именем " + client.getUserName())
-                    .setEvent(ServerMessage.Events.UPDATE_USERS)
+            client.sendMessage(Serialization.toJson(new ServerMessage("Подключение к серверу прошло успешно!", ServerMessage.Events.JOINING_SUCCESS)));
+            sendAllClientsMessage(new ServerMessage("В чат добавлен новый собеседник с именем " + client.getUserName(), ServerMessage.Events.UPDATE_USERS)
                     .setUserNames(getUserNames()));
         }
     }
@@ -212,12 +212,10 @@ public class Server {
     private void removeClient(Client client) {
         try {
             clients.get().remove(client);
-            client.sendMessage(Serialization.toJson(new ServerMessage("Вы исключены из чата")
-                    .setEvent(ServerMessage.Events.CLOSE)));
+            client.sendMessage(Serialization.toJson(new ServerMessage("Вы исключены из чата", ServerMessage.Events.CLOSE)));
             client.close();
             if (client.isAddedToChat()) {
-                sendAllClientsMessage(new ServerMessage("Собеседник с именем " + client.getUserName() + " вышел из чата")
-                        .setEvent(ServerMessage.Events.UPDATE_USERS)
+                sendAllClientsMessage(new ServerMessage("Собеседник с именем " + client.getUserName() + " вышел из чата", ServerMessage.Events.UPDATE_USERS)
                         .setUserNames(getUserNames()));
             }
         } catch (IOException e) {
@@ -225,8 +223,8 @@ public class Server {
         }
     }
 
-    private void sendAllClientsMessage(Communication communication) throws IOException {
-        String json = Serialization.toJson(communication);
+    private void sendAllClientsMessage(Message message) throws IOException {
+        String json = Serialization.toJson(message);
         for (Client clientItem : clients.get()) {
             if (clientItem.isAddedToChat()) {
                 clientItem.sendMessage(json);
