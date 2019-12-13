@@ -2,7 +2,7 @@ package ru.cft.focusstart.dto;
 
 import java.util.List;
 
-public class ServerMessage extends Communication {
+public class ServerMessage extends Message {
 
     private String message;
     private List<String> userNames;
@@ -10,8 +10,8 @@ public class ServerMessage extends Communication {
 
     private ServerMessage() {}
 
-    public ServerMessage(String message) {
-        event = Events.NONE;
+    public ServerMessage(String message, Events event) {
+        this.event = event;
         this.message = message;
     }
 
@@ -32,16 +32,12 @@ public class ServerMessage extends Communication {
         return event;
     }
 
-    public ServerMessage setEvent(Events event) {
-        this.event = event;
-        return this;
-    }
-
     public enum Events {
-        NONE,
-        SUCCESS,
+        JOINING_ERROR,
+        JOINING_SUCCESS,
         ERROR,
         UPDATE_USERS,
+        PRESENCE_SURVEY,
         CLOSE
     }
 }

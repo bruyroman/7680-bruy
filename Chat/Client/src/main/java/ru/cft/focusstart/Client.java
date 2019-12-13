@@ -3,12 +3,11 @@ package ru.cft.focusstart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.cft.focusstart.View.*;
-import ru.cft.focusstart.dto.Communication;
+import ru.cft.focusstart.dto.Message;
 import ru.cft.focusstart.dto.ServerMessage;
 import ru.cft.focusstart.dto.UserMessage;
 
 import java.net.ConnectException;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -74,23 +73,24 @@ public class Client {
     }
 
     public void sendMessage(String message) {
-        chatView.get().addMessage(userName, LocalDateTime.now(), message);
+        UserMessage userMessage = new UserMessage(userName, message, UserMessage.Events.CHAT_MESSAGE);
+        chatView.get().addMessage(userName, userMessage.getDateTime(), message);
         try {
-            connection.sendCommunication(new UserMessage(userName, LocalDateTime.now(), message));
+            connection.sendMessage(userMessage);
         } catch (Exception e) {
             infoView.showDialog(e.getMessage());
         }
     }
 
-    public void acceptMessage(Communication communication) {
-        if (communication.getClass().getName() == UserMessage.class.getName()) {
-            UserMessage userMessage = (UserMessage) communication;
+    public void acceptMessage(Message message) {
+        if (message.getClass().getName() == UserMessage.class.getName()) {
+            UserMessage userMessage = (UserMessage) message;
             if (!userMessage.getUserName().equals(userName)) {
                 chatView.get().addMessage(userMessage.getUserName(), userMessage.getDateTime(), userMessage.getMessage());
             }
 
-        } else if (communication.getClass().getName() == ServerMessage.class.getName()) {
-            ServerMessage serverMessage = (ServerMessage) communication;
+        } else if (message.getClass().getName() == ServerMessage.class.getName()) {
+            ServerMessage serverMessage = (ServerMessage) message;
             switch (serverMessage.getEvent()) {
                 case UPDATE_USERS:
                     userNames = serverMessage.getUserNames();
@@ -107,11 +107,14 @@ public class Client {
                         chatView.get().stopChat();
                     }
                     break;
+                case PRESENCE_SURVEY:
+                    connection.sendMessage(new UserMessage(userName, UserMessage.Events.ACTIVITY_CONFIRMATION));
+                    break;
                 default:
                     LOGGER.info("Сервер прислал неожиданное событие! (" + serverMessage.getEvent() + ")");
             }
         } else {
-            LOGGER.info("Пришло неизвестное сообщение!" + System.lineSeparator() + communication.getClass().getName());
+            LOGGER.info("Пришло неизвестное сообщение!" + System.lineSeparator() + message.getClass().getName());
         }
     }
 
