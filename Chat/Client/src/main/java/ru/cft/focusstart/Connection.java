@@ -68,9 +68,9 @@ public class Connection {
             if (message.getClass().getName() == ServerMessage.class.getName()) {
                 ServerMessage serverMessage = (ServerMessage) message;
                 switch (serverMessage.getEvent()) {
-                    case SUCCESS:
+                    case JOINING_SUCCESS:
                         break;
-                    case ERROR:
+                    case JOINING_ERROR:
                         throw new ConnectException(serverMessage.getMessage());
                     default:
                         throw new ConnectException("Некорректный ответ от сервера! (" + serverMessage.getEvent() + ")" + System.lineSeparator() + serverMessage.getMessage());
@@ -120,7 +120,7 @@ public class Connection {
         while (!interrupted) {
             if (Duration.between(lastActivityServer.get(), LocalDateTime.now()).getSeconds() * 1000 > MILLISECOND_VALID_SERVER_INACTIVITY_INTERVAL) {
                 interrupted = true;
-                client.acceptMessage(new ServerMessage("Сервер недоступен").setEvent(ServerMessage.Events.CLOSE));
+                client.acceptMessage(new ServerMessage("Сервер недоступен", ServerMessage.Events.CLOSE));
             }
 
             try {

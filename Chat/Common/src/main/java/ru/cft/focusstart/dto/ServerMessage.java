@@ -10,8 +10,8 @@ public class ServerMessage extends Message {
 
     private ServerMessage() {}
 
-    public ServerMessage(String message) {
-        event = Events.NONE;
+    public ServerMessage(String message, Events event) {
+        this.event = event;
         this.message = message;
     }
 
@@ -32,14 +32,9 @@ public class ServerMessage extends Message {
         return event;
     }
 
-    public ServerMessage setEvent(Events event) {
-        this.event = event;
-        return this;
-    }
-
     public enum Events {
-        NONE,
-        SUCCESS,
+        JOINING_ERROR,
+        JOINING_SUCCESS,
         ERROR,
         UPDATE_USERS,
         PRESENCE_SURVEY,

@@ -87,8 +87,7 @@ public class Server {
             messageListener.interrupt();
             exclusionMissingClients.interrupt();
 
-            String json = Serialization.toJson(new ServerMessage("Сервер завершил работу")
-                    .setEvent(ServerMessage.Events.CLOSE));
+            String json = Serialization.toJson(new ServerMessage("Сервер завершил работу", ServerMessage.Events.CLOSE));
             for (Client clientItem : clients.get()) {
                 clientItem.sendMessage(json);
                 clientItem.close();
@@ -117,7 +116,7 @@ public class Server {
         boolean interrupted = false;
         while (!interrupted) {
             try {
-                sendAllClientsMessage(new ServerMessage("Опрос о присутствии").setEvent(ServerMessage.Events.PRESENCE_SURVEY));
+                sendAllClientsMessage(new ServerMessage("Опрос о присутствии", ServerMessage.Events.PRESENCE_SURVEY));
             } catch (IOException e) {
                 interrupted = Thread.currentThread().isInterrupted();
                 if (!interrupted) {
@@ -191,21 +190,20 @@ public class Server {
                     break;
             }
         } else {
-            client.sendMessage(Serialization.toJson(new ServerMessage("Сервер не ждал данные типа " + message.getClass().getName() + " от данного клиента!")));
+            client.sendMessage(Serialization.toJson(new ServerMessage("Сервер не ждал данные типа " + message.getClass().getName() + " от данного клиента!", ServerMessage.Events.ERROR)));
         }
     }
 
     private void addClient(Client client) throws IOException {
         if (client.getUserName().trim().length() == 0) {
-            client.sendMessage(Serialization.toJson(new ServerMessage("Нельзя иметь пустое имя!").setEvent(ServerMessage.Events.ERROR)));
+            client.sendMessage(Serialization.toJson(new ServerMessage("Нельзя иметь пустое имя!", ServerMessage.Events.JOINING_ERROR)));
         } else if (getUserNames().contains(client.getUserName())) {
-            client.sendMessage(Serialization.toJson(new ServerMessage("В чате уже существует пользователь с таким именем!").setEvent(ServerMessage.Events.ERROR)));
+            client.sendMessage(Serialization.toJson(new ServerMessage("В чате уже существует пользователь с таким именем!", ServerMessage.Events.JOINING_ERROR)));
         } else {
             client.setAddedToChat(true);
-            client.sendMessage(Serialization.toJson(new ServerMessage("Подключение к серверу прошло успешно!").setEvent(ServerMessage.Events.SUCCESS)));
+            client.sendMessage(Serialization.toJson(new ServerMessage("Подключение к серверу прошло успешно!", ServerMessage.Events.JOINING_SUCCESS)));
 
-            sendAllClientsMessage(new ServerMessage("В чат добавлен новый собеседник с именем " + client.getUserName())
-                    .setEvent(ServerMessage.Events.UPDATE_USERS)
+            sendAllClientsMessage(new ServerMessage("В чат добавлен новый собеседник с именем " + client.getUserName(), ServerMessage.Events.UPDATE_USERS)
                     .setUserNames(getUserNames()));
         }
     }
@@ -213,12 +211,10 @@ public class Server {
     private void removeClient(Client client) {
         try {
             clients.get().remove(client);
-            client.sendMessage(Serialization.toJson(new ServerMessage("Вы исключены из чата")
-                    .setEvent(ServerMessage.Events.CLOSE)));
+            client.sendMessage(Serialization.toJson(new ServerMessage("Вы исключены из чата", ServerMessage.Events.CLOSE)));
             client.close();
             if (client.isAddedToChat()) {
-                sendAllClientsMessage(new ServerMessage("Собеседник с именем " + client.getUserName() + " вышел из чата")
-                        .setEvent(ServerMessage.Events.UPDATE_USERS)
+                sendAllClientsMessage(new ServerMessage("Собеседник с именем " + client.getUserName() + " вышел из чата", ServerMessage.Events.UPDATE_USERS)
                         .setUserNames(getUserNames()));
             }
         } catch (IOException e) {
