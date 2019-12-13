@@ -20,12 +20,14 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class Server {
     private static final Logger LOGGER = LoggerFactory.getLogger(Server.class);
+    private static final long MILLISECOND_CLIENT_POLLING_INTERVAL = 15000;
 
     private ServerSocket serverSocket;
     private AtomicReference<List<Client>> clients;
     private Integer port;
     private Thread messageListener;
     private Thread connectionListener;
+    private Thread clientsSurvey;
 
     public static void main(String[] args) {
         try {
@@ -51,6 +53,8 @@ public class Server {
         Runtime.getRuntime().addShutdownHook(new Thread(this::close));
         messageListener = new Thread(this::runMessageListener);
         messageListener.start();
+        clientsSurvey = new Thread(this::runClientsSurvey);
+        clientsSurvey.start();
         connectionListener = new Thread(this::runConnectionListener);
         connectionListener.start();
 
@@ -83,6 +87,7 @@ public class Server {
             connectionListener.interrupt();
             serverSocket.close();
             messageListener.interrupt();
+            clientsSurvey.interrupt();
 
             String json = Serialization.toJson(new ServerMessage("Сервер завершил работу")
                     .setEvent(ServerMessage.Events.CLOSE));
@@ -106,6 +111,26 @@ public class Server {
                 if (!interrupted) {
                     LOGGER.error("Произошла неудачная попытка подключения к серверу!" + System.lineSeparator() + e.getMessage());
                 }
+            }
+        }
+    }
+
+    private void runClientsSurvey() {
+        boolean interrupted = false;
+        while (!interrupted) {
+            try {
+                sendAllClientsMessage(new ServerMessage("Опрос о присутствии").setEvent(ServerMessage.Events.PRESENCE_SURVEY));
+            } catch (IOException e) {
+                interrupted = Thread.currentThread().isInterrupted();
+                if (!interrupted) {
+                    LOGGER.error("Произошла неудачная попытка опроса клиентов!" + System.lineSeparator() + e.getMessage());
+                }
+            }
+
+            try {
+                Thread.sleep(MILLISECOND_CLIENT_POLLING_INTERVAL);
+            } catch (InterruptedException e) {
+                interrupted = true;
             }
         }
     }

@@ -42,6 +42,7 @@ public class ServerMessage extends Communication {
         SUCCESS,
         ERROR,
         UPDATE_USERS,
+        PRESENCE_SURVEY,
         CLOSE
     }
 }

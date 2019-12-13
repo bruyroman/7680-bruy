@@ -101,12 +101,12 @@ public class Connection {
         }
     }
 
-    public void sendCommunication(Communication communication) throws Exception {
+    public void sendCommunication(Communication communication) {
         try {
             writer.get().println(Serialization.toJson(communication));
             writer.get().flush();
         } catch (IOException e) {
-            throw new Exception("Ошибка при отправке сообщения!", e);
+            LOGGER.error("Ошибка при отправке сообщения!" + System.lineSeparator() + e.getMessage());
         }
     }
 }
