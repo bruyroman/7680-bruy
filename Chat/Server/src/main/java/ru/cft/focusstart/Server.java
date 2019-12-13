@@ -26,6 +26,7 @@ public class Server {
     private Integer port;
     private Thread messageListener;
     private Thread connectionListener;
+    private Thread exclusionMissingClients;
 
     public static void main(String[] args) {
         try {
@@ -51,6 +52,8 @@ public class Server {
         Runtime.getRuntime().addShutdownHook(new Thread(this::close));
         messageListener = new Thread(this::runMessageListener);
         messageListener.start();
+        exclusionMissingClients = new Thread(this::runExclusionMissingClients);
+        exclusionMissingClients.start();
         connectionListener = new Thread(this::runConnectionListener);
         connectionListener.start();
 
@@ -83,6 +86,7 @@ public class Server {
             connectionListener.interrupt();
             serverSocket.close();
             messageListener.interrupt();
+            exclusionMissingClients.interrupt();
 
             String json = Serialization.toJson(new ServerMessage("Сервер завершил работу")
                     .setEvent(ServerMessage.Events.CLOSE));
@@ -106,6 +110,37 @@ public class Server {
                 if (!interrupted) {
                     LOGGER.error("Произошла неудачная попытка подключения к серверу!" + System.lineSeparator() + e.getMessage());
                 }
+            }
+        }
+    }
+
+    private void runExclusionMissingClients() {
+        boolean interrupted = false;
+        while (!interrupted) {
+            try {
+                sendAllClientsMessage(new ServerMessage("Опрос о присутствии").setEvent(ServerMessage.Events.PRESENCE_SURVEY));
+            } catch (IOException e) {
+                interrupted = Thread.currentThread().isInterrupted();
+                if (!interrupted) {
+                    LOGGER.error("Произошла неудачная попытка опроса клиентов!" + System.lineSeparator() + e.getMessage());
+                }
+            }
+
+            try {
+                Thread.sleep(Client.MILLISECOND_POLLING_INTERVAL);
+            } catch (InterruptedException e) {
+                interrupted = true;
+            }
+
+            List<Client> excludedClients = new ArrayList<>();
+            for (Client clientItem : clients.get()) {
+                if (clientItem.getInactiveTimeInMilliseconds() > Client.MILLISECOND_ALLOWABLE_INACTIVITY_INTERVAL) {
+                    excludedClients.add(clientItem);
+                }
+            }
+
+            for (Client clientItem : excludedClients) {
+                removeClient(clientItem);
             }
         }
     }
@@ -174,12 +209,20 @@ public class Server {
         }
     }
 
-    private void removeClient(Client client) throws IOException {
-        clients.get().remove(client);
-        client.close();
-        sendAllClientsMessage(new ServerMessage("Собеседник с именем  " + client.getUserName() + " вышел из чата")
-                .setEvent(ServerMessage.Events.UPDATE_USERS)
-                .setUserNames(getUserNames()));
+    private void removeClient(Client client) {
+        try {
+            clients.get().remove(client);
+            client.sendMessage(Serialization.toJson(new ServerMessage("Вы исключены из чата")
+                    .setEvent(ServerMessage.Events.CLOSE)));
+            client.close();
+            if (client.isAddedToChat()) {
+                sendAllClientsMessage(new ServerMessage("Собеседник с именем " + client.getUserName() + " вышел из чата")
+                        .setEvent(ServerMessage.Events.UPDATE_USERS)
+                        .setUserNames(getUserNames()));
+            }
+        } catch (IOException e) {
+            LOGGER.error("Удаление клиента с именем \"" + client.getUserName() + "\" не удалось!");
+        }
     }
 
     private void sendAllClientsMessage(Communication communication) throws IOException {
