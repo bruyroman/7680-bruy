@@ -8,15 +8,15 @@ import java.io.IOException;
 
 public final class Serialization {
 
+    private static ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
+
     private Serialization() {}
 
     public static String toJson(Message message) throws IOException {
-        ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
         return mapper.writeValueAsString(message);
     }
 
     public static Message fromJson(String json) throws IOException {
-        ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
         return mapper.readValue(json, Message.class);
     }
 }
