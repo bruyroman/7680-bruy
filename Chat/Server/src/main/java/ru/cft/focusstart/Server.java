@@ -215,9 +215,11 @@ public class Server {
             client.sendMessage(Serialization.toJson(new ServerMessage("Вы исключены из чата")
                     .setEvent(ServerMessage.Events.CLOSE)));
             client.close();
-            sendAllClientsMessage(new ServerMessage("Собеседник с именем  " + client.getUserName() + " вышел из чата")
-                    .setEvent(ServerMessage.Events.UPDATE_USERS)
-                    .setUserNames(getUserNames()));
+            if (client.isAddedToChat()) {
+                sendAllClientsMessage(new ServerMessage("Собеседник с именем " + client.getUserName() + " вышел из чата")
+                        .setEvent(ServerMessage.Events.UPDATE_USERS)
+                        .setUserNames(getUserNames()));
+            }
         } catch (IOException e) {
             LOGGER.error("Удаление клиента с именем \"" + client.getUserName() + "\" не удалось!");
         }
