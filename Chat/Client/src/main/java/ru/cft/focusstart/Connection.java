@@ -14,18 +14,17 @@ import java.net.ConnectException;
 import java.net.Socket;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class Connection {
     private static final Logger LOGGER = LoggerFactory.getLogger(Connection.class);
-    private static long MILLISECOND_VALID_SERVER_INACTIVITY_INTERVAL = 15000;
+    private static final long MILLISECOND_VALID_SERVER_INACTIVITY_INTERVAL = 15000;
 
-    private AtomicReference<LocalDateTime> lastActivityServer;
+    private volatile LocalDateTime lastActivityServer;
     private String address;
     private Integer port;
     private Socket socket;
     private BufferedReader reader;
-    private AtomicReference<PrintWriter> writer;
+    private PrintWriter writer;
     private Thread messageListener;
     private Thread serverActivityListener;
     private Client client;
@@ -33,15 +32,13 @@ public class Connection {
     public Connection(String address, Integer port) {
         this.address = address;
         this.port = port;
-        lastActivityServer = new AtomicReference<>();
-        lastActivityServer.set(LocalDateTime.now());
+        lastActivityServer = LocalDateTime.now();
     }
 
     public void connect(Client client) throws ConnectException {
         try {
             socket = new Socket(address, port);
-            writer = new AtomicReference<>();
-            writer.set(new PrintWriter(socket.getOutputStream()));
+            writer = new PrintWriter(socket.getOutputStream());
             reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         } catch (IOException e) {
             throw new ConnectException("Сервер недоступен!" + System.lineSeparator() + e.getMessage());
@@ -49,7 +46,7 @@ public class Connection {
 
         this.client = client;
         joiningUser();
-        lastActivityServer.set(LocalDateTime.now());
+        lastActivityServer = LocalDateTime.now();
 
         Runtime.getRuntime().addShutdownHook(new Thread(this::close));
         messageListener = new Thread(this::runMessageListener);
@@ -60,11 +57,11 @@ public class Connection {
 
     private void joiningUser() throws ConnectException {
         try {
-            writer.get().println(Serialization.toJson(new UserMessage(client.getUserName(), UserMessage.Events.JOINING)));
-            writer.get().flush();
+            writer.println(Serialization.toJson(new UserMessage(client.getUserName(), UserMessage.Events.JOINING)));
+            writer.flush();
 
             Message message = Serialization.fromJson(reader.readLine());
-            if (message.getClass().getName() == ServerMessage.class.getName()) {
+            if (message instanceof ServerMessage) {
                 ServerMessage serverMessage = (ServerMessage) message;
                 switch (serverMessage.getEvent()) {
                     case JOINING_SUCCESS:
@@ -85,8 +82,8 @@ public class Connection {
     public void close() {
         try {
             messageListener.interrupt();
-            writer.get().println(Serialization.toJson(new UserMessage(client.getUserName(), UserMessage.Events.CLOSE)));
-            writer.get().flush();
+            writer.println(Serialization.toJson(new UserMessage(client.getUserName(), UserMessage.Events.CLOSE)));
+            writer.flush();
             socket.close();
         } catch (IOException e) {
             LOGGER.error(e.getMessage());
@@ -98,7 +95,7 @@ public class Connection {
         while (!interrupted) {
             try {
                 client.acceptMessage(Serialization.fromJson(reader.readLine()));
-                lastActivityServer.set(LocalDateTime.now());
+                lastActivityServer = LocalDateTime.now();
             } catch (IOException e) {
                 interrupted = Thread.currentThread().isInterrupted() || socket.isClosed();
                 if (!interrupted) {
@@ -116,7 +113,7 @@ public class Connection {
     private void runServerActivityListener() {
         boolean interrupted = false;
         while (!interrupted) {
-            if (Duration.between(lastActivityServer.get(), LocalDateTime.now()).getSeconds() * 1000 > MILLISECOND_VALID_SERVER_INACTIVITY_INTERVAL) {
+            if (Duration.between(lastActivityServer, LocalDateTime.now()).getSeconds() * 1000 > MILLISECOND_VALID_SERVER_INACTIVITY_INTERVAL) {
                 interrupted = true;
                 client.acceptMessage(new ServerMessage("Сервер недоступен", ServerMessage.Events.CLOSE));
             }
@@ -131,8 +128,8 @@ public class Connection {
 
     public void sendMessage(Message message) {
         try {
-            writer.get().println(Serialization.toJson(message));
-            writer.get().flush();
+            writer.println(Serialization.toJson(message));
+            writer.flush();
         } catch (IOException e) {
             LOGGER.error("Ошибка при отправке сообщения!" + System.lineSeparator() + e.getMessage());
         }

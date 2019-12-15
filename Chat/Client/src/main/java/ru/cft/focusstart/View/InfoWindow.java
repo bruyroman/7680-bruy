@@ -2,7 +2,7 @@ package ru.cft.focusstart.View;
 
 import javax.swing.*;
 
-public class InfoWindow extends JFrame implements InfoView {
+public class InfoWindow extends JFrame {
 
     public InfoWindow() {
         setLocationRelativeTo(null);
