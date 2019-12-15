@@ -5,6 +5,7 @@ import ru.cft.focusstart.Client;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.net.ConnectException;
 
 public class ConnectionWindow extends JFrame implements ConnectionView {
 
@@ -69,12 +70,13 @@ public class ConnectionWindow extends JFrame implements ConnectionView {
         setVisible(true);
     }
 
-    public void hideView() {
-        setVisible(false);
-    }
-
     private void connect(ActionEvent e) {
         setVisible(false);
-        client.connect(jtfServerAddress.getText(), jtfUserName.getText());
+        try {
+            client.connect(jtfServerAddress.getText(), jtfUserName.getText());
+        } catch (ConnectException ex) {
+            new InfoWindow().showDialog(ex.getMessage());
+            setVisible(true);
+        }
     }
 }
