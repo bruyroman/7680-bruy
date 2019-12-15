@@ -11,17 +11,13 @@ import java.io.InputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-import java.util.Scanner;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.*;
 
 public class Server {
     private static final Logger LOGGER = LoggerFactory.getLogger(Server.class);
 
     private ServerSocket serverSocket;
-    private AtomicReference<List<Client>> clients;
+    private List<Client> clients;
     private Integer port;
     private Thread messageListener;
     private Thread connectionListener;
@@ -36,8 +32,7 @@ public class Server {
     }
 
     public Server() {
-        clients = new AtomicReference<>();
-        clients.set(new ArrayList<>());
+        clients = Collections.synchronizedList(new ArrayList<>());
     }
 
     public void start() throws SocketException {
@@ -88,7 +83,7 @@ public class Server {
             exclusionMissingClients.interrupt();
 
             String json = Serialization.toJson(new ServerMessage("Сервер завершил работу", ServerMessage.Events.CLOSE));
-            for (Client clientItem : clients.get()) {
+            for (Client clientItem : clients) {
                 clientItem.sendMessage(json);
                 clientItem.close();
             }
@@ -102,7 +97,7 @@ public class Server {
         while (!interrupted) {
             try {
                 Socket clientSocket = serverSocket.accept();
-                clients.get().add(new Client(clientSocket));
+                clients.add(new Client(clientSocket));
             } catch (IOException e) {
                 interrupted = Thread.currentThread().isInterrupted();
                 if (!interrupted) {
@@ -131,7 +126,7 @@ public class Server {
             }
 
             List<Client> excludedClients = new ArrayList<>();
-            for (Client clientItem : clients.get()) {
+            for (Client clientItem : clients) {
                 if (clientItem.getInactiveTimeInMilliseconds() > Client.MILLISECOND_ALLOWABLE_INACTIVITY_INTERVAL) {
                     excludedClients.add(clientItem);
                 }
@@ -148,7 +143,7 @@ public class Server {
         while (!interrupted) {
             try {
                 Client client = null;
-                for (Client clientItem : clients.get()) {
+                for (Client clientItem : clients) {
                     if (clientItem.haveMessage()) {
                         client = clientItem;
                         break;
@@ -173,7 +168,7 @@ public class Server {
     private void processMessage(Client client) throws IOException {
         Message message = Serialization.fromJson(client.getMessage());
 
-        if (message.getClass().getName() == UserMessage.class.getName()) {
+        if (message instanceof UserMessage) {
             UserMessage userMessage = (UserMessage) message;
             switch (userMessage.getEvent()) {
                 case JOINING:
@@ -211,7 +206,7 @@ public class Server {
 
     private void removeClient(Client client) {
         try {
-            clients.get().remove(client);
+            clients.remove(client);
             client.sendMessage(Serialization.toJson(new ServerMessage("Вы исключены из чата", ServerMessage.Events.CLOSE)));
             client.close();
             if (client.isAddedToChat()) {
@@ -225,7 +220,7 @@ public class Server {
 
     private void sendAllClientsMessage(Message message) throws IOException {
         String json = Serialization.toJson(message);
-        for (Client clientItem : clients.get()) {
+        for (Client clientItem : clients) {
             if (clientItem.isAddedToChat()) {
                 clientItem.sendMessage(json);
             }
@@ -234,7 +229,7 @@ public class Server {
 
     private List<String> getUserNames() {
         List<String> userNames = new ArrayList<>();
-        for (Client clientItem : clients.get()) {
+        for (Client clientItem : clients) {
             if (clientItem.isAddedToChat()) {
                 userNames.add(clientItem.getUserName());
             }

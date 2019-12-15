@@ -9,14 +9,13 @@ import ru.cft.focusstart.dto.UserMessage;
 
 import java.net.ConnectException;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class Client {
     private static final Logger LOGGER = LoggerFactory.getLogger(Client.class);
 
     private ConnectionView connectionView;
     private Connection connection;
-    private AtomicReference<ChatView> chatView;
+    private ChatView chatView;
     private InfoView infoView;
     private List<String> userNames;
     private String userName;
@@ -26,7 +25,6 @@ public class Client {
     }
 
     public Client() {
-        chatView = new AtomicReference<>();
         infoView = new InfoWindow();
         connectionView = new ConnectionWindow(this);
         connectionView.setDefaultAddress("localhost:1010");
@@ -57,7 +55,7 @@ public class Client {
         }
 
         connectionView = null;
-        chatView.set(new ChatWindow(this));
+        chatView = new ChatWindow(this);
     }
 
     public String getUserName() {
@@ -74,7 +72,6 @@ public class Client {
 
     public void sendMessage(String message) {
         UserMessage userMessage = new UserMessage(userName, message, UserMessage.Events.CHAT_MESSAGE);
-        chatView.get().addMessage(userName, userMessage.getDateTime(), message);
         try {
             connection.sendMessage(userMessage);
         } catch (Exception e) {
@@ -82,29 +79,27 @@ public class Client {
         }
     }
 
-    public void acceptMessage(Message message) {
-        if (message.getClass().getName() == UserMessage.class.getName()) {
+    public synchronized void acceptMessage(Message message) {
+        if (message instanceof UserMessage) {
             UserMessage userMessage = (UserMessage) message;
-            if (!userMessage.getUserName().equals(userName)) {
-                chatView.get().addMessage(userMessage.getUserName(), userMessage.getDateTime(), userMessage.getMessage());
-            }
+            chatView.addMessage(userMessage.getUserName(), userMessage.getDateTime(), userMessage.getMessage());
 
-        } else if (message.getClass().getName() == ServerMessage.class.getName()) {
+        } else if (message instanceof ServerMessage) {
             ServerMessage serverMessage = (ServerMessage) message;
             switch (serverMessage.getEvent()) {
                 case UPDATE_USERS:
                     userNames = serverMessage.getUserNames();
                     userNames.remove(userName);
-                    if (chatView.get() != null) {
-                        chatView.get().addMessage(serverMessage.getMessage());
-                        chatView.get().updateUsers();
+                    if (chatView != null) {
+                        chatView.addMessage(serverMessage.getMessage());
+                        chatView.updateUsers();
                     }
                     break;
                 case CLOSE:
                     connection.close();
-                    if (chatView.get() != null) {
-                        chatView.get().addMessage(serverMessage.getMessage());
-                        chatView.get().stopChat();
+                    if (chatView != null) {
+                        chatView.addMessage(serverMessage.getMessage());
+                        chatView.stopChat();
                     }
                     break;
                 case PRESENCE_SURVEY:
