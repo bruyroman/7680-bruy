@@ -1,18 +1,17 @@
 package ru.cft.focusstart.View;
 
-import java.time.LocalDateTime;
+import ru.cft.focusstart.dto.UserMessage;
 
 public interface ChatView {
 
-    void showView();
+    void onConnect();
 
-    void hideView();
+    void onMessageReceived(UserMessage userMessage);
 
-    void addMessage(String userName, LocalDateTime dateTime, String message);
+    void onUsersUpdate(String message);
 
-    void addMessage(String message);
+    void onServerDisconnect(String message);
 
-    void updateUsers();
+    void onException(String message);
 
-    void stopChat();
 }

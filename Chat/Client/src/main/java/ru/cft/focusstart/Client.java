@@ -13,30 +13,19 @@ import java.util.List;
 public class Client {
     private static final Logger LOGGER = LoggerFactory.getLogger(Client.class);
 
-    private ConnectionView connectionView;
-    private Connection connection;
     private ChatView chatView;
-    private InfoView infoView;
+    private Connection connection;
     private List<String> userNames;
     private String userName;
 
-    public static void main(String[] args) {
-        new Client();
+    public Client(ChatView chatView) {
+        this.chatView = chatView;
     }
 
-    public Client() {
-        infoView = new InfoWindow();
-        connectionView = new ConnectionWindow(this);
-        connectionView.setDefaultAddress("localhost:1010");
-        connectionView.showView();
-    }
-
-    public void connect(String serverAddress, String userName) {
+    public void connect(String serverAddress, String userName) throws ConnectException {
         String[] address = serverAddress.split(":");
         if (address.length != 2) {
-            infoView.showDialog("Неверно введён адрес сервера!");
-            connectionView.showView();
-            return;
+            throw new ConnectException("Неверно введён адрес сервера!");
         }
 
         this.userName = userName;
@@ -45,17 +34,11 @@ public class Client {
             connection = new Connection(address[0], Integer.valueOf(address[1]));
             connection.connect(this);
         } catch (NumberFormatException e) {
-            infoView.showDialog("Порт должен быть числом!" + System.lineSeparator() + e.getMessage());
-            connectionView.showView();
-            return;
+            throw new ConnectException("Порт должен быть числом!" + System.lineSeparator() + e.getMessage());
         } catch (ConnectException e) {
-            infoView.showDialog(e.getMessage());
-            connectionView.showView();
-            return;
+            throw new ConnectException(e.getMessage());
         }
-
-        connectionView = null;
-        chatView = new ChatWindow(this);
+        chatView.onConnect();
     }
 
     public String getUserName() {
@@ -75,14 +58,13 @@ public class Client {
         try {
             connection.sendMessage(userMessage);
         } catch (Exception e) {
-            infoView.showDialog(e.getMessage());
+            chatView.onException(e.getMessage());
         }
     }
 
     public synchronized void acceptMessage(Message message) {
         if (message instanceof UserMessage) {
-            UserMessage userMessage = (UserMessage) message;
-            chatView.addMessage(userMessage.getUserName(), userMessage.getDateTime(), userMessage.getMessage());
+            chatView.onMessageReceived((UserMessage) message);
 
         } else if (message instanceof ServerMessage) {
             ServerMessage serverMessage = (ServerMessage) message;
@@ -90,17 +72,11 @@ public class Client {
                 case UPDATE_USERS:
                     userNames = serverMessage.getUserNames();
                     userNames.remove(userName);
-                    if (chatView != null) {
-                        chatView.addMessage(serverMessage.getMessage());
-                        chatView.updateUsers();
-                    }
+                    chatView.onUsersUpdate(serverMessage.getMessage());
                     break;
                 case CLOSE:
                     connection.close();
-                    if (chatView != null) {
-                        chatView.addMessage(serverMessage.getMessage());
-                        chatView.stopChat();
-                    }
+                    chatView.onServerDisconnect(serverMessage.getMessage());
                     break;
                 case PRESENCE_SURVEY:
                     connection.sendMessage(new UserMessage(userName, UserMessage.Events.ACTIVITY_CONFIRMATION));
@@ -114,5 +90,3 @@ public class Client {
     }
 
 }
-
-

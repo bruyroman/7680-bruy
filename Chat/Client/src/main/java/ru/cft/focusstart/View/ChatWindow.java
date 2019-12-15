@@ -1,13 +1,13 @@
 package ru.cft.focusstart.View;
 
 import ru.cft.focusstart.Client;
+import ru.cft.focusstart.dto.UserMessage;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class ChatWindow extends JFrame implements ChatView {
@@ -24,8 +24,7 @@ public class ChatWindow extends JFrame implements ChatView {
     private JButton jbSendMessage;
     private DateTimeFormatter dateTimeFormatter;
 
-    public ChatWindow(Client client) {
-        this.client = client;
+    public ChatWindow() {
         dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm dd.MM.yy");
 
         //Настройки окна
@@ -87,16 +86,45 @@ public class ChatWindow extends JFrame implements ChatView {
 
         setLocationRelativeTo(null);
         setResizable(false);
-        setVisible(true);
-        updateUsers();
     }
 
-    public void showView() {
-        setVisible(true);
+    public void setClient(Client client) {
+        this.client = client;
     }
 
-    public void hideView() {
-        setVisible(false);
+    public void onConnect() {
+        setVisible(true);
+        usersUpdate();
+    }
+
+    public void onMessageReceived(UserMessage userMessage) {
+        addMessage(userMessage.getUserName() + " (" + dateTimeFormatter.format(userMessage.getDateTime()) + "):" + System.lineSeparator() + userMessage.getMessage());
+    }
+
+    public void onUsersUpdate(String message) {
+        addMessage(message);
+        usersUpdate();
+    }
+
+    public void onServerDisconnect(String message) {
+        addMessage(message);
+        jbSendMessage.setEnabled(false);
+        jtaUserMessage.setEnabled(false);
+        jtaUserMessage.setText("");
+    }
+
+    public void onException(String message) {
+        new InfoWindow().showDialog(message);
+    }
+
+    private void addMessage(String message) {
+        jtaMessages.append(message + System.lineSeparator() + System.lineSeparator());
+    }
+
+    private void usersUpdate() {
+        jtaUsers.setText("Ваше имя: " + client.getUserName() + System.lineSeparator() + System.lineSeparator() +
+                "В чате присутствуют:" + System.lineSeparator() +
+                String.join(System.lineSeparator(), client.getConnectedUsers()));
     }
 
     private void sendMessage(ActionEvent e) {
@@ -110,26 +138,6 @@ public class ChatWindow extends JFrame implements ChatView {
             jtaUserMessage.setCaretPosition(0);
         }
         jtaUserMessage.grabFocus();
-    }
-
-    public void addMessage(String userName, LocalDateTime dateTime, String message) {
-        addMessage(userName + " (" + dateTimeFormatter.format(dateTime) + "):" + System.lineSeparator() + message);
-    }
-
-    public void addMessage(String message) {
-        jtaMessages.append(message + System.lineSeparator() + System.lineSeparator());
-    }
-
-    public void updateUsers() {
-        jtaUsers.setText("Ваше имя: " + client.getUserName() + System.lineSeparator() + System.lineSeparator() +
-                "В чате присутствуют:" + System.lineSeparator() +
-                String.join(System.lineSeparator(), client.getConnectedUsers()));
-    }
-    
-    public void stopChat() {
-        jbSendMessage.setEnabled(false);
-        jtaUserMessage.setEnabled(false);
-        jtaUserMessage.setText("");
     }
 
     private class KeyListenerUserMessage implements KeyListener {

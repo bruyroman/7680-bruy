@@ -6,6 +6,4 @@ public interface ConnectionView {
 
     void showView();
 
-    void hideView();
-
 }
