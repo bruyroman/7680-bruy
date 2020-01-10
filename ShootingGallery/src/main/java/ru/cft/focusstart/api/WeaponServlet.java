@@ -15,9 +15,10 @@ public class WeaponServlet extends HttpServlet {
     private static final String WEAPON_PATTERN = "^/weapons/(?<id>[0-9]+)$";
 
     private final ObjectMapper mapper = new ObjectMapper();
+    private final ExceptionHandler exceptionHandler = ExceptionHandler.getInstance();
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
             String path = getPath(req);
             if (path.matches(WEAPONS_PATTERN)) {
@@ -28,7 +29,7 @@ public class WeaponServlet extends HttpServlet {
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             }
         } catch (Exception e) {
-            //TODO:ECXEPTION
+            exceptionHandler.handleExceptions(e, resp);
         }
     }
 
@@ -44,7 +45,7 @@ public class WeaponServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
             String path = getPath(req);
             if (path.matches(WEAPONS_PATTERN)) {
@@ -53,7 +54,7 @@ public class WeaponServlet extends HttpServlet {
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             }
         } catch (Exception e) {
-            //TODO:ECXEPTION
+            exceptionHandler.handleExceptions(e, resp);
         }
     }
 
@@ -63,7 +64,7 @@ public class WeaponServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPut(HttpServletRequest req, HttpServletResponse resp) {
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
             String path = getPath(req);
             if (path.matches(WEAPON_PATTERN)) {
@@ -72,7 +73,7 @@ public class WeaponServlet extends HttpServlet {
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             }
         } catch (Exception e) {
-            //TODO:ECXEPTION
+            exceptionHandler.handleExceptions(e, resp);
         }
     }
 

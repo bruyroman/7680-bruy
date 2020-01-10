@@ -17,9 +17,10 @@ public class InstructorServlet extends HttpServlet {
     private static final String INSTRUCTOR_VISITS_PATTERN = "^/instructors/(?<id>[0-9]+)/visits$";
 
     private final ObjectMapper mapper = new ObjectMapper();
+    private final ExceptionHandler exceptionHandler = ExceptionHandler.getInstance();
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
             String path = getPath(req);
             if (path.matches(INSTRUCTORS_PATTERN)) {
@@ -34,7 +35,7 @@ public class InstructorServlet extends HttpServlet {
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             }
         } catch (Exception e) {
-            //TODO:ECXEPTION
+            exceptionHandler.handleExceptions(e, resp);
         }
     }
 
@@ -60,7 +61,7 @@ public class InstructorServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
             String path = getPath(req);
             if (path.matches(INSTRUCTORS_PATTERN)) {
@@ -69,7 +70,7 @@ public class InstructorServlet extends HttpServlet {
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             }
         } catch (Exception e) {
-            //TODO:ECXEPTION
+            exceptionHandler.handleExceptions(e, resp);
         }
     }
 
@@ -79,7 +80,7 @@ public class InstructorServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPut(HttpServletRequest req, HttpServletResponse resp) {
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
             String path = getPath(req);
             if (path.matches(INSTRUCTOR_PATTERN)) {
@@ -88,7 +89,7 @@ public class InstructorServlet extends HttpServlet {
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             }
         } catch (Exception e) {
-            //TODO:ECXEPTION
+            exceptionHandler.handleExceptions(e, resp);
         }
     }
 
