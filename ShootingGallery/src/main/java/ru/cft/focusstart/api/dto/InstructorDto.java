@@ -70,13 +70,13 @@ public class InstructorDto {
 
     @Override
     public String toString() {
-        return "BookDto{" +
+        return "InstructorDto{" +
                 "id=" + id +
                 ", surname='" + surname + '\'' +
                 ", name='" + name + '\'' +
                 ", patronymic='" + patronymic + '\'' +
-                ", birthdate=" + birthdate +
-                ", category=" + category +
+                ", birthdate='" + birthdate + '\'' +
+                ", category='" + category + '\'' +
                 '}';
     }
 

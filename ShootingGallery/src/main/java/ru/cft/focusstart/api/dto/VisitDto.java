@@ -91,16 +91,16 @@ public class VisitDto {
 
     @Override
     public String toString() {
-        return "BookDto{" +
+        return "VisitDto{" +
                 "id=" + id +
                 ", surname='" + surname + '\'' +
                 ", name='" + name + '\'' +
                 ", patronymic='" + patronymic + '\'' +
-                ", birthdate=" + birthdate +
+                ", birthdate='" + birthdate + '\'' +
                 ", instructorId=" + instructorId +
-                ", weaponId='" + weaponId + '\'' +
-                ", datetimeStart=" + datetimeStart +
-                ", datetimeEnd=" + datetimeEnd +
+                ", weaponId=" + weaponId +
+                ", datetimeStart='" + datetimeStart + '\'' +
+                ", datetimeEnd='" + datetimeEnd + '\'' +
                 '}';
     }
 
