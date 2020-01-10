@@ -68,12 +68,12 @@ public class WeaponDto {
 
     @Override
     public String toString() {
-        return "BookDto{" +
+        return "WeaponDto{" +
                 "id=" + id +
-                ", instructorId='" + instructorId + '\'' +
+                ", instructorId=" + instructorId +
                 ", type='" + type + '\'' +
                 ", model='" + model + '\'' +
-                ", series=" + series +
+                ", series='" + series + '\'' +
                 ", number=" + number +
                 '}';
     }
