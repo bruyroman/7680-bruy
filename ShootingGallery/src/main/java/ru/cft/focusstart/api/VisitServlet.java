@@ -1,12 +1,15 @@
 package ru.cft.focusstart.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import ru.cft.focusstart.api.dto.VisitDto;
+import ru.cft.focusstart.service.visit.VisitService;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 
 @WebServlet(urlPatterns = "/visits/*")
 public class VisitServlet extends HttpServlet {
@@ -15,6 +18,7 @@ public class VisitServlet extends HttpServlet {
     private static final String VISIT_PATTERN = "^/visits/(?<id>[0-9]+)$";
 
     private final ObjectMapper mapper = new ObjectMapper();
+    private final VisitService visitService = null;
     private final ExceptionHandler exceptionHandler = ExceptionHandler.getInstance();
 
     @Override
@@ -34,14 +38,19 @@ public class VisitServlet extends HttpServlet {
     }
 
     private void get(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        String name = req.getParameter("name");
-        //TODO:LOGIC
-        writeResp(resp, name + "\r\nGET");
+        String dateTimeFrom = req.getParameter("dateTimeFrom");
+        String dateTimeTo = req.getParameter("dateTimeTo");
+        String fullNameClient = req.getParameter("fullNameClient");
+
+        List<VisitDto> response = visitService.get(dateTimeFrom, dateTimeTo, fullNameClient);
+        writeResp(resp, response);
     }
 
     private void getById(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        //TODO:LOGIC
-        writeResp(resp, "getById");
+        Long id = PathParser.getPathPart(getPath(req), VISIT_PATTERN, "id");
+
+        VisitDto response = visitService.getById(id);
+        writeResp(resp, response);
     }
 
     @Override
@@ -59,8 +68,10 @@ public class VisitServlet extends HttpServlet {
     }
 
     private void create(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        //TODO:LOGIC
-        writeResp(resp, "create");
+        VisitDto request = mapper.readValue(req.getInputStream(), VisitDto.class);
+
+        VisitDto response = visitService.create(request);
+        writeResp(resp, response);
     }
 
     @Override
@@ -78,8 +89,11 @@ public class VisitServlet extends HttpServlet {
     }
 
     private void merge(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        //TODO:LOGIC
-        writeResp(resp, "merge");
+        Long id = PathParser.getPathPart(getPath(req), VISIT_PATTERN, "id");
+        VisitDto request = mapper.readValue(req.getInputStream(), VisitDto.class);
+
+        VisitDto response = visitService.merge(id, request);
+        writeResp(resp, response);
     }
 
     @Override
@@ -97,8 +111,8 @@ public class VisitServlet extends HttpServlet {
     }
 
     private void delete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        //TODO:LOGIC
-        writeResp(resp, "delete");
+        Long id = PathParser.getPathPart(getPath(req), VISIT_PATTERN, "id");
+        visitService.delete(id);
     }
 
     private String getPath(HttpServletRequest req) {

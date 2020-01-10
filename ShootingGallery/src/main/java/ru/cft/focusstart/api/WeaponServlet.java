@@ -1,12 +1,15 @@
 package ru.cft.focusstart.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import ru.cft.focusstart.api.dto.WeaponDto;
+import ru.cft.focusstart.service.weapon.WeaponService;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 
 @WebServlet(urlPatterns = "/weapons/*")
 public class WeaponServlet extends HttpServlet {
@@ -15,6 +18,7 @@ public class WeaponServlet extends HttpServlet {
     private static final String WEAPON_PATTERN = "^/weapons/(?<id>[0-9]+)$";
 
     private final ObjectMapper mapper = new ObjectMapper();
+    private final WeaponService weaponService = null;
     private final ExceptionHandler exceptionHandler = ExceptionHandler.getInstance();
 
     @Override
@@ -34,14 +38,19 @@ public class WeaponServlet extends HttpServlet {
     }
 
     private void get(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        String name = req.getParameter("name");
-        //TODO:LOGIC
-        writeResp(resp, name + "\r\nGET");
+        String type = req.getParameter("type");
+        String model = req.getParameter("model");
+        String fullNameInstructor = req.getParameter("fullNameInstructor");
+
+        List<WeaponDto> response = weaponService.get(type, model, fullNameInstructor);
+        writeResp(resp, response);
     }
 
     private void getById(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        //TODO:LOGIC
-        writeResp(resp, "getById");
+        Long id = PathParser.getPathPart(getPath(req), WEAPON_PATTERN, "id");
+
+        WeaponDto response = weaponService.getById(id);
+        writeResp(resp, response);
     }
 
     @Override
@@ -59,8 +68,10 @@ public class WeaponServlet extends HttpServlet {
     }
 
     private void create(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        //TODO:LOGIC
-        writeResp(resp, "create");
+        WeaponDto request = mapper.readValue(req.getInputStream(), WeaponDto.class);
+
+        WeaponDto response = weaponService.create(request);
+        writeResp(resp, response);
     }
 
     @Override
@@ -78,8 +89,11 @@ public class WeaponServlet extends HttpServlet {
     }
 
     private void merge(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        //TODO:LOGIC
-        writeResp(resp, "merge");
+        Long id = PathParser.getPathPart(getPath(req), WEAPON_PATTERN, "id");
+        WeaponDto request = mapper.readValue(req.getInputStream(), WeaponDto.class);
+
+        WeaponDto response = weaponService.merge(id, request);
+        writeResp(resp, response);
     }
 
     private String getPath(HttpServletRequest req) {

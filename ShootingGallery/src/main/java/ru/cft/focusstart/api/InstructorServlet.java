@@ -1,12 +1,17 @@
 package ru.cft.focusstart.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import ru.cft.focusstart.api.dto.InstructorDto;
+import ru.cft.focusstart.api.dto.VisitDto;
+import ru.cft.focusstart.api.dto.WeaponDto;
+import ru.cft.focusstart.service.instructor.InstructorService;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 
 @WebServlet(urlPatterns = "/instructors/*")
 public class InstructorServlet extends HttpServlet {
@@ -17,6 +22,7 @@ public class InstructorServlet extends HttpServlet {
     private static final String INSTRUCTOR_VISITS_PATTERN = "^/instructors/(?<id>[0-9]+)/visits$";
 
     private final ObjectMapper mapper = new ObjectMapper();
+    private final InstructorService instructorService = null;
     private final ExceptionHandler exceptionHandler = ExceptionHandler.getInstance();
 
     @Override
@@ -40,24 +46,32 @@ public class InstructorServlet extends HttpServlet {
     }
 
     private void get(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        String name = req.getParameter("name");
-        //TODO:LOGIC
-        writeResp(resp, name + "\r\nGET");
+        String fullName = req.getParameter("fullName");
+        String category = req.getParameter("category");
+
+        List<InstructorDto> response = instructorService.get(fullName, category);
+        writeResp(resp, response);
     }
 
     private void getById(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        //TODO:LOGIC
-        writeResp(resp, "getById");
+        Long id = PathParser.getPathPart(getPath(req), INSTRUCTOR_PATTERN, "id");
+
+        InstructorDto response = instructorService.getById(id);
+        writeResp(resp, response);
     }
 
     private void getWeapons(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        //TODO:LOGIC
-        writeResp(resp, "getWeapons");
+        Long id = PathParser.getPathPart(getPath(req), INSTRUCTOR_WEAPONS_PATTERN, "id");
+
+        List<WeaponDto> response = instructorService.getWeapons(id);
+        writeResp(resp, response);
     }
 
     private void getVisits(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        //TODO:LOGIC
-        writeResp(resp, "getVisits");
+        Long id = PathParser.getPathPart(getPath(req), INSTRUCTOR_VISITS_PATTERN, "id");
+
+        List<VisitDto> response = instructorService.getVisits(id);
+        writeResp(resp, response);
     }
 
     @Override
@@ -75,8 +89,10 @@ public class InstructorServlet extends HttpServlet {
     }
 
     private void create(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        //TODO:LOGIC
-        writeResp(resp, "create");
+        InstructorDto request = mapper.readValue(req.getInputStream(), InstructorDto.class);
+
+        InstructorDto response = instructorService.create(request);
+        writeResp(resp, response);
     }
 
     @Override
@@ -94,8 +110,11 @@ public class InstructorServlet extends HttpServlet {
     }
 
     private void merge(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        //TODO:LOGIC
-        writeResp(resp, "merge");
+        Long id = PathParser.getPathPart(getPath(req), INSTRUCTOR_PATTERN, "id");
+        InstructorDto request = mapper.readValue(req.getInputStream(), InstructorDto.class);
+
+        InstructorDto response = instructorService.merge(id, request);
+        writeResp(resp, response);
     }
 
     private String getPath(HttpServletRequest req) {
