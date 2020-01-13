@@ -1,6 +1,12 @@
 ﻿package ru.cft.focusstart.service.validation;
 
+import ru.cft.focusstart.entity.InstructorCategory;
 import ru.cft.focusstart.exception.InvalidParametersException;
+
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public final class Validator {
 
@@ -30,6 +36,28 @@ public final class Validator {
                             maxSize
                     )
             );
+        }
+    }
+
+    public static void checkCategory(String parameterName, String category) throws InvalidParametersException {
+        try {
+            InstructorCategory.valueOf(category);
+        } catch (Exception e) {
+            List<String> categories = Arrays.stream(InstructorCategory.values()).map(x -> x.getName()).collect(Collectors.toList());
+            throw new InvalidParametersException(
+                    String.format("Parameter '%s' must match one of the categories: %s",
+                            parameterName,
+                            String.join(",", categories)
+                    )
+            );
+        }
+    }
+
+    public static void checkLocalDateTime(String parameterName, String dateTime) throws InvalidParametersException {
+        try {
+            LocalDateTime.parse(dateTime);
+        } catch (Exception e) {
+            throw new InvalidParametersException(String.format("Parameter '%s' is invalid", parameterName));
         }
     }
 }
