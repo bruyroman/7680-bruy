@@ -2,6 +2,7 @@ package ru.cft.focusstart.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ru.cft.focusstart.api.dto.WeaponDto;
+import ru.cft.focusstart.service.weapon.DefaultWeaponService;
 import ru.cft.focusstart.service.weapon.WeaponService;
 
 import javax.servlet.annotation.WebServlet;
@@ -18,7 +19,7 @@ public class WeaponServlet extends HttpServlet {
     private static final String WEAPON_PATTERN = "^/weapons/(?<id>[0-9]+)$";
 
     private final ObjectMapper mapper = new ObjectMapper();
-    private final WeaponService weaponService = null;
+    private final WeaponService weaponService = DefaultWeaponService.getInstance();
     private final ExceptionHandler exceptionHandler = ExceptionHandler.getInstance();
 
     @Override

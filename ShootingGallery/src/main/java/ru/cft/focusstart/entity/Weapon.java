@@ -1,6 +1,5 @@
 ﻿package ru.cft.focusstart.entity;
 
-import java.util.List;
 import java.util.Objects;
 
 public class Weapon {
@@ -11,7 +10,6 @@ public class Weapon {
     private String model;
     private String series;
     private Integer number;
-    private List<Visit> visits;
 
     public Long getId() {
         return id;
@@ -59,14 +57,6 @@ public class Weapon {
 
     public void setNumber(Integer number) {
         this.number = number;
-    }
-
-    public List<Visit> getVisits() {
-        return visits;
-    }
-
-    public void setVisits(List<Visit> visits) {
-        this.visits = visits;
     }
 
     @Override
