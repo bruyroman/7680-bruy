@@ -8,7 +8,10 @@ import ru.cft.focusstart.entity.Weapon;
 import ru.cft.focusstart.exception.ObjectNotFoundException;
 import ru.cft.focusstart.mapper.VisitMapper;
 import ru.cft.focusstart.repository.instructor.InstructorRepository;
+import ru.cft.focusstart.repository.instructor.JdbcInstructorRepository;
+import ru.cft.focusstart.repository.visit.JdbcVisitRepository;
 import ru.cft.focusstart.repository.visit.VisitRepository;
+import ru.cft.focusstart.repository.weapon.JdbcWeaponRepository;
 import ru.cft.focusstart.repository.weapon.WeaponRepository;
 import ru.cft.focusstart.service.validation.Validator;
 
@@ -20,9 +23,9 @@ public class DefaultVisitService implements VisitService {
 
     private static final DefaultVisitService INSTANCE = new DefaultVisitService();
 
-    private final InstructorRepository instructorRepository = null;
-    private final WeaponRepository weaponRepository = null;
-    private final VisitRepository visitRepository = null;
+    private final InstructorRepository instructorRepository = JdbcInstructorRepository.getInstance();
+    private final WeaponRepository weaponRepository = JdbcWeaponRepository.getInstance();
+    private final VisitRepository visitRepository = JdbcVisitRepository.getInstance();
     private final VisitMapper visitMapper = VisitMapper.getInstance();
 
     private DefaultVisitService() {}
