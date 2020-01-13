@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ru.cft.focusstart.api.dto.InstructorDto;
 import ru.cft.focusstart.api.dto.VisitDto;
 import ru.cft.focusstart.api.dto.WeaponDto;
+import ru.cft.focusstart.service.instructor.DefaultInstructorService;
 import ru.cft.focusstart.service.instructor.InstructorService;
 
 import javax.servlet.annotation.WebServlet;
@@ -22,7 +23,7 @@ public class InstructorServlet extends HttpServlet {
     private static final String INSTRUCTOR_VISITS_PATTERN = "^/instructors/(?<id>[0-9]+)/visits$";
 
     private final ObjectMapper mapper = new ObjectMapper();
-    private final InstructorService instructorService = null;
+    private final InstructorService instructorService = DefaultInstructorService.getInstance();
     private final ExceptionHandler exceptionHandler = ExceptionHandler.getInstance();
 
     @Override

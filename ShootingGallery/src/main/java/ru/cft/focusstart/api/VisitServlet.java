@@ -2,6 +2,7 @@ package ru.cft.focusstart.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ru.cft.focusstart.api.dto.VisitDto;
+import ru.cft.focusstart.service.visit.DefaultVisitService;
 import ru.cft.focusstart.service.visit.VisitService;
 
 import javax.servlet.annotation.WebServlet;
@@ -18,7 +19,7 @@ public class VisitServlet extends HttpServlet {
     private static final String VISIT_PATTERN = "^/visits/(?<id>[0-9]+)$";
 
     private final ObjectMapper mapper = new ObjectMapper();
-    private final VisitService visitService = null;
+    private final VisitService visitService = DefaultVisitService.getInstance();
     private final ExceptionHandler exceptionHandler = ExceptionHandler.getInstance();
 
     @Override
