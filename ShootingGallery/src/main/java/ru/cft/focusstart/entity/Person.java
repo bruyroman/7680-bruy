@@ -1,4 +1,4 @@
-﻿package ru.cft.focusstart.entity;
+package ru.cft.focusstart.entity;
 
 import java.util.Date;
 import java.util.Objects;

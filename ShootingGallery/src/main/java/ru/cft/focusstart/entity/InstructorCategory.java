@@ -1,4 +1,4 @@
-﻿package ru.cft.focusstart.entity;
+package ru.cft.focusstart.entity;
 
 public enum InstructorCategory {
     ONE("Первая"),

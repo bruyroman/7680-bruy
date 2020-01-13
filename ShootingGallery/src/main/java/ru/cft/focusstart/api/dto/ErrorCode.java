@@ -1,4 +1,4 @@
-﻿package ru.cft.focusstart.api.dto;
+package ru.cft.focusstart.api.dto;
 
 public enum ErrorCode {
     INTERNAL_ERROR(1),

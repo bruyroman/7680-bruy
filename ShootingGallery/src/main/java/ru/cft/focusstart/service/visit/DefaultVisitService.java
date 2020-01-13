@@ -1,4 +1,4 @@
-﻿package ru.cft.focusstart.service.visit;
+package ru.cft.focusstart.service.visit;
 
 import ru.cft.focusstart.api.dto.VisitDto;
 import ru.cft.focusstart.entity.Instructor;

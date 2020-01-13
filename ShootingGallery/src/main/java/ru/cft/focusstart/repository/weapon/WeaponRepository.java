@@ -1,4 +1,4 @@
-﻿package ru.cft.focusstart.repository.weapon;
+package ru.cft.focusstart.repository.weapon;
 
 import ru.cft.focusstart.entity.Weapon;
 

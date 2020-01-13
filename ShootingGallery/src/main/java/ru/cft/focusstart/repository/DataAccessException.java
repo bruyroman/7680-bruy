@@ -1,4 +1,4 @@
-﻿package ru.cft.focusstart.repository;
+package ru.cft.focusstart.repository;
 
 public class DataAccessException extends RuntimeException {
 

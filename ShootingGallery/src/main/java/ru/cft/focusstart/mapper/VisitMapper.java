@@ -1,4 +1,4 @@
-﻿package ru.cft.focusstart.mapper;
+package ru.cft.focusstart.mapper;
 
 import ru.cft.focusstart.api.dto.VisitDto;
 import ru.cft.focusstart.entity.Visit;

@@ -1,4 +1,4 @@
-﻿package ru.cft.focusstart.api.dto;
+package ru.cft.focusstart.api.dto;
 
 import java.util.Objects;
 

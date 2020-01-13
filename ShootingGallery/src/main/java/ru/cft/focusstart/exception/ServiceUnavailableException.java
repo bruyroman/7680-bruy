@@ -1,4 +1,4 @@
-﻿package ru.cft.focusstart.exception;
+package ru.cft.focusstart.exception;
 
 public class ServiceUnavailableException extends ApplicationException {
 

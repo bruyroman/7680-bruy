@@ -1,4 +1,4 @@
-﻿package ru.cft.focusstart.api;
+package ru.cft.focusstart.api;
 
 import ru.cft.focusstart.exception.ObjectNotFoundException;
 

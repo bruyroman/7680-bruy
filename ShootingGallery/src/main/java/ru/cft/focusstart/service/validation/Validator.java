@@ -1,4 +1,4 @@
-﻿package ru.cft.focusstart.service.validation;
+package ru.cft.focusstart.service.validation;
 
 import ru.cft.focusstart.entity.InstructorCategory;
 import ru.cft.focusstart.exception.InvalidParametersException;

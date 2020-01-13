@@ -1,4 +1,4 @@
-﻿package ru.cft.focusstart.api;
+package ru.cft.focusstart.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ru.cft.focusstart.api.dto.ErrorDto;

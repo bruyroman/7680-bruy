@@ -1,4 +1,4 @@
-﻿package ru.cft.focusstart.repository;
+package ru.cft.focusstart.repository;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;

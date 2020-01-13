@@ -1,4 +1,4 @@
-﻿package ru.cft.focusstart.mapper;
+package ru.cft.focusstart.mapper;
 
 import ru.cft.focusstart.api.dto.InstructorDto;
 import ru.cft.focusstart.entity.Instructor;

@@ -1,4 +1,4 @@
-﻿package ru.cft.focusstart.service.weapon;
+package ru.cft.focusstart.service.weapon;
 
 import ru.cft.focusstart.api.dto.WeaponDto;
 

@@ -1,4 +1,4 @@
-﻿package ru.cft.focusstart.repository.visit;
+package ru.cft.focusstart.repository.visit;
 
 import ru.cft.focusstart.entity.Visit;
 

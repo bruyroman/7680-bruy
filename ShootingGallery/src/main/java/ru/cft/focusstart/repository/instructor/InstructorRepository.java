@@ -1,4 +1,4 @@
-﻿package ru.cft.focusstart.repository.instructor;
+package ru.cft.focusstart.repository.instructor;
 
 import ru.cft.focusstart.entity.Instructor;
 import ru.cft.focusstart.entity.InstructorCategory;
