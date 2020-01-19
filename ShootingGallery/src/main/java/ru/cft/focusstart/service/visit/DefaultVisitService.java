@@ -16,6 +16,7 @@ import ru.cft.focusstart.repository.weapon.WeaponRepository;
 import ru.cft.focusstart.service.validation.Validator;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,9 +37,20 @@ public class DefaultVisitService implements VisitService {
 
     @Override
     public List<VisitDto> get(String dateTimeFrom, String dateTimeTo, String fullNameClient) {
-        Validator.checkLocalDateTime("dateTimeFrom", dateTimeFrom);
-        Validator.checkLocalDateTime("dateTimeTo", dateTimeTo);
-        return visitRepository.get(LocalDateTime.parse(dateTimeFrom), LocalDateTime.parse(dateTimeTo), fullNameClient)
+        LocalDateTime localDateTimeFrom = null;
+        LocalDateTime localDateTimeTo = null;
+
+        if (dateTimeFrom != null && dateTimeFrom.length() > 0) {
+            Validator.checkLocalDateTime("dateTimeFrom", dateTimeFrom);
+            localDateTimeFrom = LocalDateTime.parse(dateTimeFrom, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        }
+
+        if (dateTimeTo != null && dateTimeTo.length() > 0) {
+            Validator.checkLocalDateTime("dateTimeTo", dateTimeTo);
+            localDateTimeTo = LocalDateTime.parse(dateTimeTo, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        }
+
+        return visitRepository.get(localDateTimeFrom, localDateTimeTo, fullNameClient)
                 .stream()
                 .map(visitMapper::toDto)
                 .collect(Collectors.toList());
@@ -123,7 +135,9 @@ public class DefaultVisitService implements VisitService {
     }
 
     private Visit update(Visit visit, VisitDto visitDto) {
-        visit.setClient(toClient(visitDto));
+        Person client = toClient(visitDto);
+        client.setId(visit.getClient().getId());
+        visit.setClient(client);
 
         if (!visitDto.getInstructorId().equals(visit.getInstructor().getId())) {
             visit.setInstructor(getInstructor(visitDto.getInstructorId()));

@@ -107,32 +107,32 @@ public class WeaponDto {
             this.number = weaponDto.number;
         }
 
-        public Builder setId(Long id) {
+        public Builder id(Long id) {
             this.id = id;
             return this;
         }
 
-        public Builder setInstructorId(Long instructorId) {
+        public Builder instructorId(Long instructorId) {
             this.instructorId = instructorId;
             return this;
         }
 
-        public Builder setType(String type) {
+        public Builder type(String type) {
             this.type = type;
             return this;
         }
 
-        public Builder setModel(String model) {
+        public Builder model(String model) {
             this.model = model;
             return this;
         }
 
-        public Builder setSeries(String series) {
+        public Builder series(String series) {
             this.series = series;
             return this;
         }
 
-        public Builder setNumber(Integer number) {
+        public Builder number(Integer number) {
             this.number = number;
             return this;
         }

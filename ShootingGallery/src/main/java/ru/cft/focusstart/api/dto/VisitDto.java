@@ -1,7 +1,11 @@
 package ru.cft.focusstart.api.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -14,10 +18,18 @@ public class VisitDto {
     private final String surname;
     private final String name;
     private final String patronymic;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private final Date birthdate;
     private final Long instructorId;
     private final Long weaponId;
+
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private final LocalDateTime datetimeStart;
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private final LocalDateTime datetimeEnd;
 
     private VisitDto(Long id, String surname, String name, String patronymic, Date birthdate, Long instructorId, Long weaponId, LocalDateTime datetimeStart, LocalDateTime datetimeEnd) {
@@ -139,47 +151,51 @@ public class VisitDto {
             this.datetimeEnd = visitDto.datetimeEnd;
         }
 
-        public Builder setId(Long id) {
+        public Builder id(Long id) {
             this.id = id;
             return this;
         }
 
-        public Builder setSurname(String surname) {
+        public Builder surname(String surname) {
             this.surname = surname;
             return this;
         }
 
-        public Builder setName(String name) {
+        public Builder name(String name) {
             this.name = name;
             return this;
         }
 
-        public Builder setPatronymic(String patronymic) {
+        public Builder patronymic(String patronymic) {
             this.patronymic = patronymic;
             return this;
         }
 
-        public Builder setBirthdate(Date birthdate) {
+        public Builder birthdate(Date birthdate) {
             this.birthdate = birthdate;
             return this;
         }
 
-        public Builder setInstructorId(Long instructorId) {
+        public Builder instructorId(Long instructorId) {
             this.instructorId = instructorId;
             return this;
         }
 
-        public Builder setWeaponId(Long weaponId) {
+        public Builder weaponId(Long weaponId) {
             this.weaponId = weaponId;
             return this;
         }
 
-        public Builder setDatetimeStart(LocalDateTime datetimeStart) {
+        @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+        public Builder datetimeStart(LocalDateTime datetimeStart) {
             this.datetimeStart = datetimeStart;
             return this;
         }
 
-        public Builder setDatetimeEnd(LocalDateTime datetimeEnd) {
+        @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+        public Builder datetimeEnd(LocalDateTime datetimeEnd) {
             this.datetimeEnd = datetimeEnd;
             return this;
         }

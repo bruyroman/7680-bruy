@@ -37,7 +37,11 @@ public class DefaultInstructorService implements InstructorService {
     @Override
     public List<InstructorDto> get(String fullName, String category) {
         Validator.checkCategory("category", category);
-        return instructorRepository.get(fullName, InstructorCategory.valueOf(category))
+        InstructorCategory instructorCategory = null;
+        if (category != null && category.length() > 0) {
+            instructorCategory = InstructorCategory.valueOf(category);
+        }
+        return instructorRepository.get(fullName, instructorCategory)
                 .stream()
                 .map(instructorMapper::toDto)
                 .collect(Collectors.toList());
@@ -129,7 +133,9 @@ public class DefaultInstructorService implements InstructorService {
     }
 
     private Instructor update(Instructor instructor, InstructorDto instructorDto) {
-        instructor.setPerson(toPerson(instructorDto));
+        Person person = toPerson(instructorDto);
+        person.setId(instructor.getPerson().getId());
+        instructor.setPerson(person);
         instructor.setCategory(instructorDto.getCategory());
 
         instructorRepository.update(instructor);

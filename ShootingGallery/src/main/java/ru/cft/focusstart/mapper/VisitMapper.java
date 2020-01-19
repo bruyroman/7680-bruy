@@ -15,15 +15,15 @@ public class VisitMapper {
 
     public VisitDto toDto(Visit visit) {
         return VisitDto.builder()
-                .setId(visit.getId())
-                .setSurname(visit.getClient().getSurname())
-                .setName(visit.getClient().getName())
-                .setPatronymic(visit.getClient().getPatronymic())
-                .setBirthdate(visit.getClient().getBirthdate())
-                .setInstructorId(visit.getInstructor().getId())
-                .setWeaponId(visit.getWeapon().getId())
-                .setDatetimeStart(visit.getDatetimeStart())
-                .setDatetimeEnd(visit.getDatetimeEnd())
+                .id(visit.getId())
+                .surname(visit.getClient().getSurname())
+                .name(visit.getClient().getName())
+                .patronymic(visit.getClient().getPatronymic())
+                .birthdate(visit.getClient().getBirthdate())
+                .instructorId(visit.getInstructor().getId())
+                .weaponId(visit.getWeapon().getId())
+                .datetimeStart(visit.getDatetimeStart())
+                .datetimeEnd(visit.getDatetimeEnd())
                 .build();
     }
 }

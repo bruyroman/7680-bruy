@@ -15,12 +15,12 @@ public class InstructorMapper {
 
     public InstructorDto toDto(Instructor instructor) {
         return InstructorDto.builder()
-                .setId(instructor.getId())
-                .setSurname(instructor.getPerson().getSurname())
-                .setName(instructor.getPerson().getName())
-                .setPatronymic(instructor.getPerson().getPatronymic())
-                .setBirthdate(instructor.getPerson().getBirthdate())
-                .setCategory(instructor.getCategory())
+                .id(instructor.getId())
+                .surname(instructor.getPerson().getSurname())
+                .name(instructor.getPerson().getName())
+                .patronymic(instructor.getPerson().getPatronymic())
+                .birthdate(instructor.getPerson().getBirthdate())
+                .category(instructor.getCategory())
                 .build();
     }
 }

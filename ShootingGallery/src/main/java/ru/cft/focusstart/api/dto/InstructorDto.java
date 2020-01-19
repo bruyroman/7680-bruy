@@ -1,5 +1,6 @@
 package ru.cft.focusstart.api.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import ru.cft.focusstart.entity.InstructorCategory;
@@ -14,6 +15,7 @@ public class InstructorDto {
     private final String surname;
     private final String name;
     private final String patronymic;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private final Date birthdate;
     private final InstructorCategory category;
 
@@ -109,32 +111,32 @@ public class InstructorDto {
             this.category = instructorDto.category;
         }
 
-        public Builder setId(Long id) {
+        public Builder id(Long id) {
             this.id = id;
             return this;
         }
 
-        public Builder setSurname(String surname) {
+        public Builder surname(String surname) {
             this.surname = surname;
             return this;
         }
 
-        public Builder setName(String name) {
+        public Builder name(String name) {
             this.name = name;
             return this;
         }
 
-        public Builder setPatronymic(String patronymic) {
+        public Builder patronymic(String patronymic) {
             this.patronymic = patronymic;
             return this;
         }
 
-        public Builder setBirthdate(Date birthdate) {
+        public Builder birthdate(Date birthdate) {
             this.birthdate = birthdate;
             return this;
         }
 
-        public Builder setCategory(InstructorCategory category) {
+        public Builder category(InstructorCategory category) {
             this.category = category;
             return this;
         }
