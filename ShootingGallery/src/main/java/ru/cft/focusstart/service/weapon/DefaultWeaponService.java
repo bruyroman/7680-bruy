@@ -6,6 +6,8 @@ import ru.cft.focusstart.entity.Weapon;
 import ru.cft.focusstart.exception.ObjectNotFoundException;
 import ru.cft.focusstart.mapper.WeaponMapper;
 import ru.cft.focusstart.repository.instructor.InstructorRepository;
+import ru.cft.focusstart.repository.instructor.JdbcInstructorRepository;
+import ru.cft.focusstart.repository.weapon.JdbcWeaponRepository;
 import ru.cft.focusstart.repository.weapon.WeaponRepository;
 import ru.cft.focusstart.service.validation.Validator;
 
@@ -16,8 +18,8 @@ public class DefaultWeaponService implements WeaponService {
 
     private static final DefaultWeaponService INSTANCE = new DefaultWeaponService();
 
-    private final InstructorRepository instructorRepository = null;
-    private final WeaponRepository weaponRepository = null;
+    private final InstructorRepository instructorRepository = JdbcInstructorRepository.getInstance();
+    private final WeaponRepository weaponRepository = JdbcWeaponRepository.getInstance();
     private final WeaponMapper weaponMapper = WeaponMapper.getInstance();
 
     private DefaultWeaponService() {}

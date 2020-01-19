@@ -11,6 +11,7 @@ import ru.cft.focusstart.mapper.InstructorMapper;
 import ru.cft.focusstart.mapper.VisitMapper;
 import ru.cft.focusstart.mapper.WeaponMapper;
 import ru.cft.focusstart.repository.instructor.InstructorRepository;
+import ru.cft.focusstart.repository.instructor.JdbcInstructorRepository;
 import ru.cft.focusstart.service.validation.Validator;
 
 import java.util.Collections;
@@ -22,7 +23,7 @@ public class DefaultInstructorService implements InstructorService {
 
     private static final DefaultInstructorService INSTANCE = new DefaultInstructorService();
 
-    private final InstructorRepository instructorRepository = null;
+    private final InstructorRepository instructorRepository = JdbcInstructorRepository.getInstance();
     private final InstructorMapper instructorMapper = InstructorMapper.getInstance();
     private final WeaponMapper weaponMapper = WeaponMapper.getInstance();
     private final VisitMapper visitMapper = VisitMapper.getInstance();
