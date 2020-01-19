@@ -60,15 +60,15 @@ public class DefaultWeaponService implements WeaponService {
     }
 
     private void validate(WeaponDto weaponDto) {
-        Validator.checkNotNull("weapon.id", weaponDto.getId());
-        Validator.checkNull("weapon.instructorId", weaponDto.getInstructorId());
+        Validator.checkNull("weapon.id", weaponDto.getId());
+        Validator.checkNotNull("weapon.instructorId", weaponDto.getInstructorId());
         Validator.checkSize("weapon.type", weaponDto.getType(), 1, 100);
         Validator.checkSize("weapon.model", weaponDto.getModel(), 1, 100);
-        Validator.checkNull("weapon.number", weaponDto.getNumber());
+        Validator.checkNotNull("weapon.number", weaponDto.getNumber());
     }
 
     private Weapon add(Long id, WeaponDto weaponDto) {
-        Instructor instructor = getInstructor(id);
+        Instructor instructor = getInstructor(weaponDto.getInstructorId());
         Weapon weapon = new Weapon();
         weapon.setId(id);
         weapon.setInstructor(instructor);
