@@ -4,11 +4,13 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.Objects;
 
 @JsonDeserialize(builder = VisitDto.Builder.class)
@@ -18,8 +20,9 @@ public class VisitDto {
     private final String surname;
     private final String name;
     private final String patronymic;
+    @JsonSerialize(using = LocalDateSerializer.class)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private final Date birthdate;
+    private final LocalDate birthdate;
     private final Long instructorId;
     private final Long weaponId;
 
@@ -27,12 +30,13 @@ public class VisitDto {
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private final LocalDateTime datetimeStart;
+
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private final LocalDateTime datetimeEnd;
 
-    private VisitDto(Long id, String surname, String name, String patronymic, Date birthdate, Long instructorId, Long weaponId, LocalDateTime datetimeStart, LocalDateTime datetimeEnd) {
+    private VisitDto(Long id, String surname, String name, String patronymic, LocalDate birthdate, Long instructorId, Long weaponId, LocalDateTime datetimeStart, LocalDateTime datetimeEnd) {
         this.id = id;
         this.surname = surname;
         this.name = name;
@@ -60,7 +64,7 @@ public class VisitDto {
         return patronymic;
     }
 
-    public Date getBirthdate() {
+    public LocalDate getBirthdate() {
         return birthdate;
     }
 
@@ -131,7 +135,7 @@ public class VisitDto {
         private String surname;
         private String name;
         private String patronymic;
-        private Date birthdate;
+        private LocalDate birthdate;
         private Long instructorId;
         private Long weaponId;
         private LocalDateTime datetimeStart;
@@ -171,7 +175,9 @@ public class VisitDto {
             return this;
         }
 
-        public Builder birthdate(Date birthdate) {
+        @JsonDeserialize(using = LocalDateDeserializer.class)
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+        public Builder birthdate(LocalDate birthdate) {
             this.birthdate = birthdate;
             return this;
         }

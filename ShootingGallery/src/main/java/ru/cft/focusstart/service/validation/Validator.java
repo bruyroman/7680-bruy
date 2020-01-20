@@ -42,9 +42,7 @@ public final class Validator {
 
     public static void checkCategory(String parameterName, String category) throws InvalidParametersException {
         try {
-            if (category != null && category.length() > 0) {
-                InstructorCategory.valueOf(category);
-            }
+            InstructorCategory.valueOf(category);
         } catch (Exception e) {
             List<String> categories = Arrays.stream(InstructorCategory.values()).map(x -> x.getName()).collect(Collectors.toList());
             throw new InvalidParametersException(

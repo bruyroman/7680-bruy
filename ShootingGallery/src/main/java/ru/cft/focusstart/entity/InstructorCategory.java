@@ -1,10 +1,10 @@
 package ru.cft.focusstart.entity;
 
 public enum InstructorCategory {
-    ONE("Первая"),
-    TWO("Вторая"),
-    THREE("Третья"),
-    HIGHEST("Высшая");
+    ONE("ONE"),
+    TWO("TWO"),
+    THREE("THREE"),
+    HIGHEST("HIGHEST");
 
     private String name;
 

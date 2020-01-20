@@ -3,9 +3,11 @@ package ru.cft.focusstart.api.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
-import ru.cft.focusstart.entity.InstructorCategory;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.Objects;
 
 @JsonDeserialize(builder = InstructorDto.Builder.class)
@@ -15,11 +17,12 @@ public class InstructorDto {
     private final String surname;
     private final String name;
     private final String patronymic;
+    @JsonSerialize(using = LocalDateSerializer.class)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private final Date birthdate;
-    private final InstructorCategory category;
+    private final LocalDate birthdate;
+    private final String category;
 
-    private InstructorDto(Long id, String surname, String name, String patronymic, Date birthdate, InstructorCategory category) {
+    private InstructorDto(Long id, String surname, String name, String patronymic, LocalDate birthdate, String category) {
         this.id = id;
         this.surname = surname;
         this.name = name;
@@ -44,11 +47,11 @@ public class InstructorDto {
         return patronymic;
     }
 
-    public Date getBirthdate() {
+    public LocalDate getBirthdate() {
         return birthdate;
     }
 
-    public InstructorCategory getCategory() {
+    public String getCategory() {
         return category;
     }
 
@@ -97,8 +100,8 @@ public class InstructorDto {
         private String surname;
         private String name;
         private String patronymic;
-        private Date birthdate;
-        private InstructorCategory category;
+        private LocalDate birthdate;
+        private String category;
 
         private Builder() {}
 
@@ -131,12 +134,14 @@ public class InstructorDto {
             return this;
         }
 
-        public Builder birthdate(Date birthdate) {
+        @JsonDeserialize(using = LocalDateDeserializer.class)
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+        public Builder birthdate(LocalDate birthdate) {
             this.birthdate = birthdate;
             return this;
         }
 
-        public Builder category(InstructorCategory category) {
+        public Builder category(String category) {
             this.category = category;
             return this;
         }

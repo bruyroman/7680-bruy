@@ -36,9 +36,9 @@ public class DefaultInstructorService implements InstructorService {
 
     @Override
     public List<InstructorDto> get(String fullName, String category) {
-        Validator.checkCategory("category", category);
         InstructorCategory instructorCategory = null;
         if (category != null && category.length() > 0) {
+            Validator.checkCategory("category", category);
             instructorCategory = InstructorCategory.valueOf(category);
         }
         return instructorRepository.get(fullName, instructorCategory)
@@ -97,14 +97,14 @@ public class DefaultInstructorService implements InstructorService {
         Validator.checkSize("instructor.surname", instructorDto.getSurname(), 1, 100);
         Validator.checkSize("instructor.name", instructorDto.getName(), 1, 100);
         Validator.checkNotNull("instructor.birthdate", instructorDto.getBirthdate());
-        Validator.checkNotNull("instructor.category", instructorDto.getCategory());
+        Validator.checkCategory("instructor.category", instructorDto.getCategory());
     }
 
     private Instructor add(Long id, InstructorDto instructorDto) {
         Instructor instructor = new Instructor();
         instructor.setId(id);
         instructor.setPerson(toPerson(instructorDto));
-        instructor.setCategory(instructorDto.getCategory());
+        instructor.setCategory(InstructorCategory.valueOf(instructorDto.getCategory()));
 
         instructorRepository.add(instructor);
 
@@ -136,7 +136,7 @@ public class DefaultInstructorService implements InstructorService {
         Person person = toPerson(instructorDto);
         person.setId(instructor.getPerson().getId());
         instructor.setPerson(person);
-        instructor.setCategory(instructorDto.getCategory());
+        instructor.setCategory(InstructorCategory.valueOf(instructorDto.getCategory()));
 
         instructorRepository.update(instructor);
 

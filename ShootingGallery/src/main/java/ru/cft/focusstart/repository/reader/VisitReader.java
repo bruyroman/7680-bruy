@@ -21,7 +21,7 @@ public final class VisitReader {
         client.setSurname(rs.getString("SURNAME"));
         client.setName(rs.getString("NAME"));
         client.setPatronymic(rs.getString("PATRONYMIC"));
-        client.setBirthdate(rs.getDate("BIRTHDATE"));
+        client.setBirthdate(rs.getDate("BIRTHDATE").toLocalDate());
         visit.setClient(client);
 
         Instructor instructor = new Instructor();
