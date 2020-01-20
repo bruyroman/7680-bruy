@@ -61,4 +61,11 @@ public final class Validator {
             throw new InvalidParametersException(String.format("Parameter '%s' is invalid", parameterName));
         }
     }
+
+    public static void checkRangeLocalDateTime(String parameterStartName, String parameterEndName, LocalDateTime datetimeStart, LocalDateTime datetimeEnd) {
+        if (datetimeEnd != null && datetimeStart != null
+                && datetimeStart.isAfter(datetimeEnd)) {
+            throw new InvalidParametersException(String.format("The parameter '%1$s' must be less than the parameter '%2$s' (%1$s < %2$s)", parameterStartName, parameterEndName));
+        }
+    }
 }

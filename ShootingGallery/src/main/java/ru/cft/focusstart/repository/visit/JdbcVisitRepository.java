@@ -34,7 +34,7 @@ public class JdbcVisitRepository implements VisitRepository {
 
     private static final String GET_BY_FULLNAME_QUERY =
             GET_QUERY +
-                    " WHERE lower(prs.\"SURNAME\"||' '||prs.\"NAME\"||' '||prs.\"PATRONYMIC\") like lower('%' || ? || '%') ";
+                    " WHERE lower(prs.\"SURNAME\"||' '||prs.\"NAME\"||' '||COALESCE(prs.\"PATRONYMIC\", '')) like lower('%' || ? || '%') ";
 
     private static final String ADD_PERSON_QUERY =
             "INSERT INTO public.\"PERSON\" (\"SURNAME\", \"NAME\", \"PATRONYMIC\", \"BIRTHDATE\") " +

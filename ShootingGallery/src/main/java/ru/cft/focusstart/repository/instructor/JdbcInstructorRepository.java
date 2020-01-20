@@ -38,35 +38,35 @@ public class JdbcInstructorRepository implements InstructorRepository {
 
     private static final String GET_VISITS_QUERY =
             "SELECT  vst.\"ID\" VISIT_ID," +
-                    "prs.\"ID\" CLIENT_ID," +
-                    "prs.\"SURNAME\"," +
-                    "prs.\"NAME\"," +
-                    "prs.\"PATRONYMIC\"," +
-                    "prs.\"BIRTHDATE\"," +
+                    "clnt.\"ID\" CLIENT_ID," +
+                    "clnt.\"SURNAME\"," +
+                    "clnt.\"NAME\"," +
+                    "clnt.\"PATRONYMIC\"," +
+                    "clnt.\"BIRTHDATE\"," +
                     "vst.\"INSTRUCTOR_ID\"," +
                     "vst.\"WEAPON_ID\"," +
                     "vst.\"DATETIME_START\"," +
                     "vst.\"DATETIME_END\" " +
                     "FROM \"INSTRUCTOR\" inst " +
                     "inner join public.\"VISIT\" vst on vst.\"INSTRUCTOR_ID\" = inst.\"ID\" " +
-                    "inner join public.\"PERSON\" prs on prs.\"ID\" = vst.\"CLIENT_ID\"";
+                    "inner join public.\"PERSON\" clnt on clnt.\"ID\" = vst.\"CLIENT_ID\"";
+
+    private static final String INSTRUCTOR_BY_FULLNAME_AND_CATEGORY_WHERE =
+            " WHERE lower(prs.\"SURNAME\"||' '||prs.\"NAME\"||' '||COALESCE(prs.\"PATRONYMIC\", '')) like lower('%' || ? || '%') " +
+                    "and lower(CAST(inst.\"CATEGORY\" as text)) like lower('%' || ? || '%')";
 
     private static final String GET_INSTRUCTOR_BY_FULLNAME_AND_CATEGORY_QUERY =
-            GET_QUERY +
-                    " WHERE lower(prs.\"SURNAME\"||' '||prs.\"NAME\"||' '||prs.\"PATRONYMIC\") like lower('%' || ? || '%') " +
-                    "and lower(CAST(inst.\"CATEGORY\" as text)) like lower('%' || ? || '%')";
+            GET_QUERY + INSTRUCTOR_BY_FULLNAME_AND_CATEGORY_WHERE;
 
     private static final String GET_WEAPONS_BY_INSTRUCTOR_FULLNAME_AND_CATEGORY_QUERY =
             GET_WEAPONS_QUERY +
-                    " inner join public.\"PERSON\" prs_ins on prs_ins.\"ID\" = inst.\"PERSON_ID\" " +
-                    "WHERE lower(prs_ins.\"SURNAME\"||' '||prs_ins.\"NAME\"||' '||prs_ins.\"PATRONYMIC\") like lower('%' || ? || '%') " +
-                    "and lower(CAST(inst.\"CATEGORY\" as text)) like lower('%' || ? || '%')";
+                    " inner join public.\"PERSON\" prs on prs.\"ID\" = inst.\"PERSON_ID\" " +
+                    INSTRUCTOR_BY_FULLNAME_AND_CATEGORY_WHERE;
 
     private static final String GET_VISITS_BY_INSTRUCTOR_FULLNAME_AND_CATEGORY_QUERY =
             GET_VISITS_QUERY +
-                    " inner join public.\"PERSON\" prs_ins on prs_ins.\"ID\" = inst.\"PERSON_ID\" " +
-                    "WHERE lower(prs_ins.\"SURNAME\"||' '||prs_ins.\"NAME\"||' '||prs_ins.\"PATRONYMIC\") like lower('%' || ? || '%') " +
-                    "and lower(CAST(inst.\"CATEGORY\" as text)) like lower('%' || ? || '%')";
+                    " inner join public.\"PERSON\" prs on prs.\"ID\" = inst.\"PERSON_ID\" " +
+                    INSTRUCTOR_BY_FULLNAME_AND_CATEGORY_WHERE;
 
     private static final String GET_INSTRUCTOR_BY_ID_QUERY =
             GET_QUERY +
@@ -216,56 +216,56 @@ public class JdbcInstructorRepository implements InstructorRepository {
     public void add(Instructor instructor) {
         try (
                 Connection con = dataSource.getConnection();
-                PreparedStatement psPersons = con.prepareStatement(ADD_PERSON_QUERY, Statement.RETURN_GENERATED_KEYS);
-                PreparedStatement psInstructors = con.prepareStatement(ADD_QUERY, Statement.RETURN_GENERATED_KEYS);
+                PreparedStatement psPerson = con.prepareStatement(ADD_PERSON_QUERY, Statement.RETURN_GENERATED_KEYS);
+                PreparedStatement psInstructor = con.prepareStatement(ADD_QUERY, Statement.RETURN_GENERATED_KEYS);
         ) {
             Person person = instructor.getPerson();
-            psPersons.setString(1, person.getSurname());
-            psPersons.setString(2, person.getName());
-            psPersons.setString(3, person.getPatronymic());
-            psPersons.setDate(4, new java.sql.Date(person.getBirthdate().getTime()));
-            psPersons.executeUpdate();
+            setQueryPerson(psPerson, person);
+            psPerson.executeUpdate();
+            person.setId(getGeneratedKeys(psPerson));
 
-            ResultSet rsPersons = psPersons.getGeneratedKeys();
-            Long idPerson = rsPersons.next() ? rsPersons.getLong(1) : null;
-            if (idPerson == null) {
-                throw new SQLException("Unexpected error - could not obtain id");
-            }
-            person.setId(idPerson);
+            psInstructor.setLong(1, person.getId());
+            psInstructor.setString(2, instructor.getCategory().toString());
+            psInstructor.executeUpdate();
 
-            psInstructors.setLong(1, idPerson);
-            psInstructors.setString(2, instructor.getCategory().toString());
-            psInstructors.executeUpdate();
-
-            ResultSet rsInstructors = psInstructors.getGeneratedKeys();
-            Long idInstructors = rsInstructors.next() ? rsInstructors.getLong(1) : null;
-            if (idInstructors == null) {
-                throw new SQLException("Unexpected error - could not obtain id");
-            }
-            instructor.setId(idInstructors);
+            instructor.setId(getGeneratedKeys(psInstructor));
         } catch (Exception e) {
             throw new DataAccessException(e);
         }
+    }
+
+    private void setQueryPerson(PreparedStatement psPerson, Person person) throws SQLException {
+        psPerson.setString(1, person.getSurname());
+        psPerson.setString(2, person.getName());
+        psPerson.setString(3, person.getPatronymic() != null ? person.getPatronymic() : "");
+        psPerson.setDate(4, java.sql.Date.valueOf(person.getBirthdate()));
+    }
+
+    private Long getGeneratedKeys(PreparedStatement ps) throws SQLException {
+        ResultSet rs = ps.getGeneratedKeys();
+        Long id = rs.next() ? rs.getLong(1) : null;
+        if (id == null) {
+            throw new SQLException("Unexpected error - could not obtain id");
+        }
+        return id;
     }
 
     @Override
     public void update(Instructor instructor) {
         try (
                 Connection con = dataSource.getConnection();
-                PreparedStatement psPersons = con.prepareStatement(UPDATE_PERSON_QUERY);
-                PreparedStatement psInstructors = con.prepareStatement(UPDATE_QUERY);
+                PreparedStatement psPerson = con.prepareStatement(UPDATE_PERSON_QUERY);
+                PreparedStatement psInstructor = con.prepareStatement(UPDATE_QUERY);
         ) {
             Person person = instructor.getPerson();
-            psPersons.setString(1, person.getSurname());
-            psPersons.setString(2, person.getName());
-            psPersons.setString(3, person.getPatronymic());
-            psPersons.setDate(4, new java.sql.Date(person.getBirthdate().getTime()));
-            psPersons.setLong(5, person.getId());
-            psPersons.executeUpdate();
+            setQueryPerson(psPerson, person);
+            psPerson.setLong(5, person.getId());
+            psPerson.executeUpdate();
 
-            psInstructors.setLong(1, person.getId());
-            psInstructors.setString(2, instructor.getCategory().toString());
-            psInstructors.setLong(3, instructor.getId());
+            psInstructor.setLong(1, person.getId());
+            psInstructor.setString(2, instructor.getCategory().toString());
+            psInstructor.setLong(3, instructor.getId());
+            psInstructor.executeUpdate();
         } catch (Exception e) {
             throw new DataAccessException(e);
         }
