@@ -42,9 +42,7 @@ public final class Validator {
 
     public static void checkCategory(String parameterName, String category) throws InvalidParametersException {
         try {
-            if (category != null && category.length() > 0) {
-                InstructorCategory.valueOf(category);
-            }
+            InstructorCategory.valueOf(category);
         } catch (Exception e) {
             List<String> categories = Arrays.stream(InstructorCategory.values()).map(x -> x.getName()).collect(Collectors.toList());
             throw new InvalidParametersException(
@@ -61,6 +59,13 @@ public final class Validator {
             LocalDateTime.parse(dateTime, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         } catch (Exception e) {
             throw new InvalidParametersException(String.format("Parameter '%s' is invalid", parameterName));
+        }
+    }
+
+    public static void checkRangeLocalDateTime(String parameterStartName, String parameterEndName, LocalDateTime datetimeStart, LocalDateTime datetimeEnd) {
+        if (datetimeEnd != null && datetimeStart != null
+                && datetimeStart.isAfter(datetimeEnd)) {
+            throw new InvalidParametersException(String.format("The parameter '%1$s' must be less than the parameter '%2$s' (%1$s < %2$s)", parameterStartName, parameterEndName));
         }
     }
 }

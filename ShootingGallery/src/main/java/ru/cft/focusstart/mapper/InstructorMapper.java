@@ -20,7 +20,7 @@ public class InstructorMapper {
                 .name(instructor.getPerson().getName())
                 .patronymic(instructor.getPerson().getPatronymic())
                 .birthdate(instructor.getPerson().getBirthdate())
-                .category(instructor.getCategory())
+                .category(instructor.getCategory().getName())
                 .build();
     }
 }

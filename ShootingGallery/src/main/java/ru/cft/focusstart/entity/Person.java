@@ -1,6 +1,6 @@
 package ru.cft.focusstart.entity;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.Objects;
 
 public class Person {
@@ -9,7 +9,7 @@ public class Person {
     private String surname;
     private String name;
     private String patronymic;
-    private Date birthdate;
+    private LocalDate birthdate;
 
     public Long getId() {
         return id;
@@ -43,11 +43,11 @@ public class Person {
         this.patronymic = patronymic;
     }
 
-    public Date getBirthdate() {
+    public LocalDate getBirthdate() {
         return birthdate;
     }
 
-    public void setBirthdate(Date birthdate) {
+    public void setBirthdate(LocalDate birthdate) {
         this.birthdate = birthdate;
     }
 

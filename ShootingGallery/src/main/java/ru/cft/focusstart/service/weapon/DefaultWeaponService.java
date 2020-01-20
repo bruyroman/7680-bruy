@@ -74,7 +74,7 @@ public class DefaultWeaponService implements WeaponService {
         weapon.setInstructor(instructor);
         weapon.setType(weaponDto.getType());
         weapon.setModel(weaponDto.getModel());
-        weapon.setSeries(weaponDto.getSeries());
+        weapon.setSeries(weaponDto.getSeries() != null ? weaponDto.getSeries() : "");
         weapon.setNumber(weaponDto.getNumber());
 
         weaponRepository.add(weapon);
@@ -102,7 +102,7 @@ public class DefaultWeaponService implements WeaponService {
     private Weapon update(Weapon weapon, WeaponDto weaponDto) {
         weapon.setType(weaponDto.getType());
         weapon.setModel(weaponDto.getModel());
-        weapon.setSeries(weaponDto.getSeries());
+        weapon.setSeries(weaponDto.getSeries() != null ? weaponDto.getSeries() : "");
         weapon.setNumber(weaponDto.getNumber());
         if (!weaponDto.getInstructorId().equals(weapon.getInstructor().getId())) {
             Instructor instructor = getInstructor(weaponDto.getInstructorId());

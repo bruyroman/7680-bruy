@@ -37,23 +37,22 @@ public class DefaultVisitService implements VisitService {
 
     @Override
     public List<VisitDto> get(String dateTimeFrom, String dateTimeTo, String fullNameClient) {
-        LocalDateTime localDateTimeFrom = null;
-        LocalDateTime localDateTimeTo = null;
-
-        if (dateTimeFrom != null && dateTimeFrom.length() > 0) {
-            Validator.checkLocalDateTime("dateTimeFrom", dateTimeFrom);
-            localDateTimeFrom = LocalDateTime.parse(dateTimeFrom, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-        }
-
-        if (dateTimeTo != null && dateTimeTo.length() > 0) {
-            Validator.checkLocalDateTime("dateTimeTo", dateTimeTo);
-            localDateTimeTo = LocalDateTime.parse(dateTimeTo, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-        }
+        LocalDateTime localDateTimeFrom = parseLocalDateTime("dateTimeFrom", dateTimeFrom);
+        LocalDateTime localDateTimeTo = parseLocalDateTime("dateTimeTo", dateTimeTo);
 
         return visitRepository.get(localDateTimeFrom, localDateTimeTo, fullNameClient)
                 .stream()
                 .map(visitMapper::toDto)
                 .collect(Collectors.toList());
+    }
+
+    private LocalDateTime parseLocalDateTime(String paremeterName, String strLocalDateTime) {
+        LocalDateTime localDateTime = null;
+        if (strLocalDateTime != null && strLocalDateTime.length() > 0) {
+            Validator.checkLocalDateTime(paremeterName, strLocalDateTime);
+            localDateTime = LocalDateTime.parse(strLocalDateTime, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        }
+        return localDateTime;
     }
 
     @Override
@@ -73,7 +72,6 @@ public class DefaultVisitService implements VisitService {
     @Override
     public VisitDto create(VisitDto visitDto) {
         validate(visitDto);
-        Validator.checkNotNull("visit.datetimeStart", visitDto.getDatetimeStart());
 
         Visit visit = add(null, visitDto);
 
@@ -87,6 +85,9 @@ public class DefaultVisitService implements VisitService {
         Validator.checkNotNull("visit.birthdate", visitDto.getBirthdate());
         Validator.checkNotNull("visit.instructorId", visitDto.getInstructorId());
         Validator.checkNotNull("visit.weaponId", visitDto.getWeaponId());
+        Validator.checkRangeLocalDateTime("visit.datetimeStart", "visit.datetimeEnd",
+                visitDto.getDatetimeStart(), visitDto.getDatetimeEnd());
+        Validator.checkNotNull("visit.datetimeStart", visitDto.getDatetimeStart());
     }
 
     private Visit add(Long id, VisitDto visitDto) {

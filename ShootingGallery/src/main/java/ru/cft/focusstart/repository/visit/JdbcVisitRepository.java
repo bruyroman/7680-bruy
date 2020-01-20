@@ -34,7 +34,7 @@ public class JdbcVisitRepository implements VisitRepository {
 
     private static final String GET_BY_FULLNAME_QUERY =
             GET_QUERY +
-                    " WHERE lower(prs.\"SURNAME\"||' '||prs.\"NAME\"||' '||prs.\"PATRONYMIC\") like lower('%' || ? || '%') ";
+                    " WHERE lower(prs.\"SURNAME\"||' '||prs.\"NAME\"||' '||COALESCE(prs.\"PATRONYMIC\", '')) like lower('%' || ? || '%') ";
 
     private static final String ADD_PERSON_QUERY =
             "INSERT INTO public.\"PERSON\" (\"SURNAME\", \"NAME\", \"PATRONYMIC\", \"BIRTHDATE\") " +
@@ -165,7 +165,7 @@ public class JdbcVisitRepository implements VisitRepository {
         psClient.setString(1, client.getSurname());
         psClient.setString(2, client.getName());
         psClient.setString(3, client.getPatronymic());
-        psClient.setDate(4, new java.sql.Date(client.getBirthdate().getTime()));
+        psClient.setDate(4, java.sql.Date.valueOf(client.getBirthdate()));
     }
 
     private void setQueryVisit(PreparedStatement psVisit, Visit visit) throws SQLException {
