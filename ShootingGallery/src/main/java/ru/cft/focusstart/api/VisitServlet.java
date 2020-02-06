@@ -1,10 +1,12 @@
 package ru.cft.focusstart.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.context.ApplicationContext;
 import ru.cft.focusstart.api.dto.VisitDto;
-import ru.cft.focusstart.service.visit.DefaultVisitService;
 import ru.cft.focusstart.service.visit.VisitService;
 
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -19,8 +21,19 @@ public class VisitServlet extends HttpServlet {
     private static final String VISIT_PATTERN = "^/visits/(?<id>[0-9]+)$";
 
     private final ObjectMapper mapper = new ObjectMapper();
-    private final VisitService visitService = DefaultVisitService.getInstance();
-    private final ExceptionHandler exceptionHandler = ExceptionHandler.getInstance();
+    private VisitService visitService;
+    private ExceptionHandler exceptionHandler;
+
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config);
+
+        ApplicationContext applicationContext =
+                (ApplicationContext) config.getServletContext().getAttribute("applicationContext");
+
+        this.visitService = applicationContext.getBean(VisitService.class);
+        this.exceptionHandler = applicationContext.getBean(ExceptionHandler.class);
+    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {

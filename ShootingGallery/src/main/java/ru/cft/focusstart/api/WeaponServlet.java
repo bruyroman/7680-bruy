@@ -1,10 +1,12 @@
 package ru.cft.focusstart.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.context.ApplicationContext;
 import ru.cft.focusstart.api.dto.WeaponDto;
-import ru.cft.focusstart.service.weapon.DefaultWeaponService;
 import ru.cft.focusstart.service.weapon.WeaponService;
 
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -19,8 +21,19 @@ public class WeaponServlet extends HttpServlet {
     private static final String WEAPON_PATTERN = "^/weapons/(?<id>[0-9]+)$";
 
     private final ObjectMapper mapper = new ObjectMapper();
-    private final WeaponService weaponService = DefaultWeaponService.getInstance();
-    private final ExceptionHandler exceptionHandler = ExceptionHandler.getInstance();
+    private WeaponService weaponService;
+    private ExceptionHandler exceptionHandler;
+
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config);
+
+        ApplicationContext applicationContext =
+                (ApplicationContext) config.getServletContext().getAttribute("applicationContext");
+
+        this.weaponService = applicationContext.getBean(WeaponService.class);
+        this.exceptionHandler = applicationContext.getBean(ExceptionHandler.class);
+    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {

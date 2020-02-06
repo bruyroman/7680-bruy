@@ -1,9 +1,9 @@
 package ru.cft.focusstart.repository.visit;
 
+import org.springframework.stereotype.Repository;
 import ru.cft.focusstart.entity.Person;
 import ru.cft.focusstart.entity.Visit;
 import ru.cft.focusstart.repository.DataAccessException;
-import ru.cft.focusstart.repository.DataSourceProvider;
 
 import javax.sql.DataSource;
 import java.sql.*;
@@ -12,6 +12,7 @@ import java.util.*;
 
 import static ru.cft.focusstart.repository.reader.VisitReader.readVisit;
 
+@Repository
 public class JdbcVisitRepository implements VisitRepository {
 
     private static final String GET_QUERY =
@@ -55,8 +56,6 @@ public class JdbcVisitRepository implements VisitRepository {
     private static final String DELETE_QUERY =
             "delete from public.\"VISIT\" where \"ID\" = ?";
 
-    private static final JdbcVisitRepository INSTANCE = new JdbcVisitRepository();
-
     private final DataSource dataSource;
 
     private static String getByFullnameAndDatetimeQuery(LocalDateTime dateTimeFrom, LocalDateTime dateTimeTo) {
@@ -65,12 +64,8 @@ public class JdbcVisitRepository implements VisitRepository {
                 (dateTimeTo == null ? "" : " and vst.\"DATETIME_END\" = ?");
     }
 
-    private JdbcVisitRepository() {
-        this.dataSource = DataSourceProvider.getDataSource();
-    }
-
-    public static VisitRepository getInstance() {
-        return INSTANCE;
+    public JdbcVisitRepository(DataSource dataSource) {
+        this.dataSource = dataSource;
     }
 
     @Override

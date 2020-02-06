@@ -1,12 +1,14 @@
 package ru.cft.focusstart.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.context.ApplicationContext;
 import ru.cft.focusstart.api.dto.InstructorDto;
 import ru.cft.focusstart.api.dto.VisitDto;
 import ru.cft.focusstart.api.dto.WeaponDto;
-import ru.cft.focusstart.service.instructor.DefaultInstructorService;
 import ru.cft.focusstart.service.instructor.InstructorService;
 
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -23,8 +25,19 @@ public class InstructorServlet extends HttpServlet {
     private static final String INSTRUCTOR_VISITS_PATTERN = "^/instructors/(?<id>[0-9]+)/visits$";
 
     private final ObjectMapper mapper = new ObjectMapper();
-    private final InstructorService instructorService = DefaultInstructorService.getInstance();
-    private final ExceptionHandler exceptionHandler = ExceptionHandler.getInstance();
+    private InstructorService instructorService;
+    private ExceptionHandler exceptionHandler;
+
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config);
+
+        ApplicationContext applicationContext =
+                (ApplicationContext) config.getServletContext().getAttribute("applicationContext");
+
+        this.instructorService = applicationContext.getBean(InstructorService.class);
+        this.exceptionHandler = applicationContext.getBean(ExceptionHandler.class);
+    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {

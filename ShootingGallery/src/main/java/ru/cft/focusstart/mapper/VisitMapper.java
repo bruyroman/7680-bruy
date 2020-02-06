@@ -1,17 +1,11 @@
 package ru.cft.focusstart.mapper;
 
+import org.springframework.stereotype.Component;
 import ru.cft.focusstart.api.dto.VisitDto;
 import ru.cft.focusstart.entity.Visit;
 
+@Component
 public class VisitMapper {
-
-    private static final VisitMapper INSTANCE = new VisitMapper();
-
-    private VisitMapper() {}
-
-    public static VisitMapper getInstance() {
-        return INSTANCE;
-    }
 
     public VisitDto toDto(Visit visit) {
         return VisitDto.builder()

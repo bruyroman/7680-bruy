@@ -1,6 +1,7 @@
 package ru.cft.focusstart.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.stereotype.Component;
 import ru.cft.focusstart.api.dto.ErrorDto;
 import ru.cft.focusstart.api.dto.ErrorCode;
 import ru.cft.focusstart.exception.InternalErrorException;
@@ -11,17 +12,10 @@ import ru.cft.focusstart.exception.ServiceUnavailableException;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+@Component
 class ExceptionHandler {
 
-    private static final ExceptionHandler INSTANCE = new ExceptionHandler();
-
     private final ObjectMapper mapper = new ObjectMapper();
-
-    private ExceptionHandler() {}
-
-    static ExceptionHandler getInstance() {
-        return INSTANCE;
-    }
 
     void handleExceptions(Exception e, HttpServletResponse resp) throws IOException {
         resp.reset();

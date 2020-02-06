@@ -1,31 +1,29 @@
 package ru.cft.focusstart.service.weapon;
 
+import org.springframework.stereotype.Service;
 import ru.cft.focusstart.api.dto.WeaponDto;
 import ru.cft.focusstart.entity.Instructor;
 import ru.cft.focusstart.entity.Weapon;
 import ru.cft.focusstart.exception.ObjectNotFoundException;
 import ru.cft.focusstart.mapper.WeaponMapper;
 import ru.cft.focusstart.repository.instructor.InstructorRepository;
-import ru.cft.focusstart.repository.instructor.JdbcInstructorRepository;
-import ru.cft.focusstart.repository.weapon.JdbcWeaponRepository;
 import ru.cft.focusstart.repository.weapon.WeaponRepository;
 import ru.cft.focusstart.service.validation.Validator;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Service
 public class DefaultWeaponService implements WeaponService {
 
-    private static final DefaultWeaponService INSTANCE = new DefaultWeaponService();
+    private final InstructorRepository instructorRepository;
+    private final WeaponRepository weaponRepository;
+    private final WeaponMapper weaponMapper;
 
-    private final InstructorRepository instructorRepository = JdbcInstructorRepository.getInstance();
-    private final WeaponRepository weaponRepository = JdbcWeaponRepository.getInstance();
-    private final WeaponMapper weaponMapper = WeaponMapper.getInstance();
-
-    private DefaultWeaponService() {}
-
-    public static WeaponService getInstance() {
-        return INSTANCE;
+    private DefaultWeaponService(InstructorRepository instructorRepository, WeaponRepository weaponRepository, WeaponMapper weaponMapper) {
+        this.instructorRepository = instructorRepository;
+        this.weaponRepository = weaponRepository;
+        this.weaponMapper = weaponMapper;
     }
 
     @Override

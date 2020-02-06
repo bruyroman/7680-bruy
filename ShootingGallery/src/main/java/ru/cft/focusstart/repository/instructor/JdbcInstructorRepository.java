@@ -1,8 +1,8 @@
 package ru.cft.focusstart.repository.instructor;
 
+import org.springframework.stereotype.Repository;
 import ru.cft.focusstart.entity.*;
 import ru.cft.focusstart.repository.DataAccessException;
-import ru.cft.focusstart.repository.DataSourceProvider;
 
 import javax.sql.DataSource;
 import java.sql.*;
@@ -12,7 +12,7 @@ import static ru.cft.focusstart.repository.reader.InstructorReader.readInstructo
 import static ru.cft.focusstart.repository.reader.VisitReader.readVisit;
 import static ru.cft.focusstart.repository.reader.WeaponReader.readWeapon;
 
-
+@Repository
 public class JdbcInstructorRepository implements InstructorRepository {
 
     private static final String GET_QUERY =
@@ -96,16 +96,10 @@ public class JdbcInstructorRepository implements InstructorRepository {
             "UPDATE public.\"INSTRUCTOR\" SET \"PERSON_ID\"=?, \"CATEGORY\"=CAST(? as instructor_category) " +
                     "WHERE \"ID\"=?";
 
-    private static final JdbcInstructorRepository INSTANCE = new JdbcInstructorRepository();
-
     private final DataSource dataSource;
 
-    private JdbcInstructorRepository() {
-        this.dataSource = DataSourceProvider.getDataSource();
-    }
-
-    public static InstructorRepository getInstance() {
-        return INSTANCE;
+    public JdbcInstructorRepository(DataSource dataSource) {
+        this.dataSource = dataSource;
     }
 
     @Override

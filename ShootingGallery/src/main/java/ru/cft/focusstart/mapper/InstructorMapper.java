@@ -1,17 +1,11 @@
 package ru.cft.focusstart.mapper;
 
+import org.springframework.stereotype.Component;
 import ru.cft.focusstart.api.dto.InstructorDto;
 import ru.cft.focusstart.entity.Instructor;
 
+@Component
 public class InstructorMapper {
-
-    private static final InstructorMapper INSTANCE = new InstructorMapper();
-
-    private InstructorMapper() {}
-
-    public static InstructorMapper getInstance() {
-        return INSTANCE;
-    }
 
     public InstructorDto toDto(Instructor instructor) {
         return InstructorDto.builder()
