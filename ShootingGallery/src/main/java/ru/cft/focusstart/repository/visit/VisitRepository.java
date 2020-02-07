@@ -14,7 +14,5 @@ public interface VisitRepository {
 
     void add(Visit visit);
 
-    void update(Visit visit);
-
     void delete(Visit visit);
 }

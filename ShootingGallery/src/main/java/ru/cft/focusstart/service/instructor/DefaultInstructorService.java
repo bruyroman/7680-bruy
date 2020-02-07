@@ -1,6 +1,8 @@
 package ru.cft.focusstart.service.instructor;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.cft.focusstart.api.dto.InstructorDto;
 import ru.cft.focusstart.api.dto.VisitDto;
 import ru.cft.focusstart.api.dto.WeaponDto;
@@ -20,6 +22,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class DefaultInstructorService implements InstructorService {
 
     private final InstructorRepository instructorRepository;
@@ -27,14 +30,8 @@ public class DefaultInstructorService implements InstructorService {
     private final WeaponMapper weaponMapper;
     private final VisitMapper visitMapper;
 
-    public DefaultInstructorService(InstructorRepository instructorRepository, InstructorMapper instructorMapper, WeaponMapper weaponMapper, VisitMapper visitMapper) {
-        this.instructorRepository = instructorRepository;
-        this.instructorMapper = instructorMapper;
-        this.weaponMapper = weaponMapper;
-        this.visitMapper = visitMapper;
-    }
-
     @Override
+    @Transactional(readOnly = true)
     public List<InstructorDto> get(String fullName, String category) {
         InstructorCategory instructorCategory = null;
         if (category != null && category.length() > 0) {
@@ -48,6 +45,7 @@ public class DefaultInstructorService implements InstructorService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public InstructorDto getById(Long id) {
         Validator.checkNotNull("id", id);
 
@@ -62,6 +60,7 @@ public class DefaultInstructorService implements InstructorService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<WeaponDto> getWeapons(Long id) {
         Validator.checkNotNull("id", id);
 
@@ -73,6 +72,7 @@ public class DefaultInstructorService implements InstructorService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<VisitDto> getVisits(Long id) {
         Validator.checkNotNull("id", id);
 
@@ -84,6 +84,7 @@ public class DefaultInstructorService implements InstructorService {
     }
 
     @Override
+    @Transactional
     public InstructorDto create(InstructorDto instructorDto) {
         validate(instructorDto);
 
@@ -112,7 +113,10 @@ public class DefaultInstructorService implements InstructorService {
     }
 
     private Person toPerson(InstructorDto instructorDto) {
-        Person person = new Person();
+        return updatePerson(new Person(), instructorDto);
+    }
+
+    private Person updatePerson(Person person, InstructorDto instructorDto) {
         person.setSurname(instructorDto.getSurname());
         person.setName(instructorDto.getName());
         person.setPatronymic(instructorDto.getPatronymic());
@@ -121,6 +125,7 @@ public class DefaultInstructorService implements InstructorService {
     }
 
     @Override
+    @Transactional
     public InstructorDto merge(Long id, InstructorDto instructorDto) {
         Validator.checkNotNull("id", id);
         validate(instructorDto);
@@ -133,12 +138,8 @@ public class DefaultInstructorService implements InstructorService {
     }
 
     private Instructor update(Instructor instructor, InstructorDto instructorDto) {
-        Person person = toPerson(instructorDto);
-        person.setId(instructor.getPerson().getId());
-        instructor.setPerson(person);
+        updatePerson(instructor.getPerson(), instructorDto);
         instructor.setCategory(InstructorCategory.valueOf(instructorDto.getCategory()));
-
-        instructorRepository.update(instructor);
 
         return instructor;
     }

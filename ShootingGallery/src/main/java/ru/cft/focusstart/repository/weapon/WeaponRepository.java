@@ -12,6 +12,4 @@ public interface WeaponRepository {
     Optional<Weapon> getById(Long id);
 
     void add(Weapon weapon);
-
-    void update(Weapon weapon);
 }

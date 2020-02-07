@@ -1,6 +1,8 @@
 package ru.cft.focusstart.service.visit;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.cft.focusstart.api.dto.VisitDto;
 import ru.cft.focusstart.entity.Instructor;
 import ru.cft.focusstart.entity.Person;
@@ -19,6 +21,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class DefaultVisitService implements VisitService {
 
     private final InstructorRepository instructorRepository;
@@ -26,14 +29,8 @@ public class DefaultVisitService implements VisitService {
     private final VisitRepository visitRepository;
     private final VisitMapper visitMapper;
 
-    public DefaultVisitService(InstructorRepository instructorRepository, WeaponRepository weaponRepository, VisitRepository visitRepository, VisitMapper visitMapper) {
-        this.instructorRepository = instructorRepository;
-        this.weaponRepository = weaponRepository;
-        this.visitRepository = visitRepository;
-        this.visitMapper = visitMapper;
-    }
-
     @Override
+    @Transactional(readOnly = true)
     public List<VisitDto> get(String dateTimeFrom, String dateTimeTo, String fullNameClient) {
         LocalDateTime localDateTimeFrom = parseLocalDateTime("dateTimeFrom", dateTimeFrom);
         LocalDateTime localDateTimeTo = parseLocalDateTime("dateTimeTo", dateTimeTo);
@@ -54,6 +51,7 @@ public class DefaultVisitService implements VisitService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public VisitDto getById(Long id) {
         Validator.checkNotNull("id", id);
 
@@ -68,6 +66,7 @@ public class DefaultVisitService implements VisitService {
     }
 
     @Override
+    @Transactional
     public VisitDto create(VisitDto visitDto) {
         validate(visitDto);
 
@@ -103,12 +102,15 @@ public class DefaultVisitService implements VisitService {
     }
 
     private Person toClient(VisitDto visitDto) {
-        Person person = new Person();
-        person.setSurname(visitDto.getSurname());
-        person.setName(visitDto.getName());
-        person.setPatronymic(visitDto.getPatronymic());
-        person.setBirthdate(visitDto.getBirthdate());
-        return person;
+        return updateClient(new Person(), visitDto);
+    }
+
+    private Person updateClient(Person client, VisitDto visitDto) {
+        client.setSurname(visitDto.getSurname());
+        client.setName(visitDto.getName());
+        client.setPatronymic(visitDto.getPatronymic());
+        client.setBirthdate(visitDto.getBirthdate());
+        return client;
     }
 
     private Instructor getInstructor(Long id) {
@@ -122,6 +124,7 @@ public class DefaultVisitService implements VisitService {
     }
 
     @Override
+    @Transactional
     public VisitDto merge(Long id, VisitDto visitDto) {
         Validator.checkNotNull("id", id);
         validate(visitDto);
@@ -134,9 +137,7 @@ public class DefaultVisitService implements VisitService {
     }
 
     private Visit update(Visit visit, VisitDto visitDto) {
-        Person client = toClient(visitDto);
-        client.setId(visit.getClient().getId());
-        visit.setClient(client);
+        updateClient(visit.getClient(), visitDto);
 
         if (!visitDto.getInstructorId().equals(visit.getInstructor().getId())) {
             visit.setInstructor(getInstructor(visitDto.getInstructorId()));
@@ -149,12 +150,11 @@ public class DefaultVisitService implements VisitService {
         visit.setDatetimeStart(visitDto.getDatetimeStart());
         visit.setDatetimeEnd(visitDto.getDatetimeEnd());
 
-        visitRepository.update(visit);
-
         return visit;
     }
 
     @Override
+    @Transactional
     public void delete(Long id) {
         Validator.checkNotNull("id", id);
 

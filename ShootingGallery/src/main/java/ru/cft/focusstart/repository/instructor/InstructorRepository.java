@@ -13,6 +13,4 @@ public interface InstructorRepository {
     Optional<Instructor> getById(Long id);
 
     void add(Instructor instructor);
-
-    void update(Instructor instructor);
 }
