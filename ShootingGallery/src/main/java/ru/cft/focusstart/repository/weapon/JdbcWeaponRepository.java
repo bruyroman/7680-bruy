@@ -1,8 +1,8 @@
 package ru.cft.focusstart.repository.weapon;
 
+import org.springframework.stereotype.Repository;
 import ru.cft.focusstart.entity.Weapon;
 import ru.cft.focusstart.repository.DataAccessException;
-import ru.cft.focusstart.repository.DataSourceProvider;
 
 import javax.sql.DataSource;
 import java.sql.*;
@@ -10,6 +10,7 @@ import java.util.*;
 
 import static ru.cft.focusstart.repository.reader.WeaponReader.readWeapon;
 
+@Repository
 public class JdbcWeaponRepository implements WeaponRepository {
 
     private static final String GET_QUERY =
@@ -40,16 +41,10 @@ public class JdbcWeaponRepository implements WeaponRepository {
             "UPDATE public.\"WEAPON\" SET \"INSTRUCTOR_ID\"=?, \"TYPE\"=?, \"MODEL\"=?, \"SERIES\"=?, \"NUMBER\"=? " +
                     "WHERE \"ID\"=?";
 
-    private static final JdbcWeaponRepository INSTANCE = new JdbcWeaponRepository();
-
     private final DataSource dataSource;
 
-    private JdbcWeaponRepository() {
-        this.dataSource = DataSourceProvider.getDataSource();
-    }
-
-    public static WeaponRepository getInstance() {
-        return INSTANCE;
+    public JdbcWeaponRepository(DataSource dataSource) {
+        this.dataSource = dataSource;
     }
 
     @Override

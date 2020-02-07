@@ -1,17 +1,11 @@
 package ru.cft.focusstart.mapper;
 
+import org.springframework.stereotype.Component;
 import ru.cft.focusstart.api.dto.WeaponDto;
 import ru.cft.focusstart.entity.Weapon;
 
+@Component
 public class WeaponMapper {
-
-    private static final WeaponMapper INSTANCE = new WeaponMapper();
-
-    private WeaponMapper() {}
-
-    public static WeaponMapper getInstance() {
-        return INSTANCE;
-    }
 
     public WeaponDto toDto(Weapon weapon) {
         return WeaponDto.builder()

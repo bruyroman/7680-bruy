@@ -1,5 +1,6 @@
 package ru.cft.focusstart.service.instructor;
 
+import org.springframework.stereotype.Service;
 import ru.cft.focusstart.api.dto.InstructorDto;
 import ru.cft.focusstart.api.dto.VisitDto;
 import ru.cft.focusstart.api.dto.WeaponDto;
@@ -11,7 +12,6 @@ import ru.cft.focusstart.mapper.InstructorMapper;
 import ru.cft.focusstart.mapper.VisitMapper;
 import ru.cft.focusstart.mapper.WeaponMapper;
 import ru.cft.focusstart.repository.instructor.InstructorRepository;
-import ru.cft.focusstart.repository.instructor.JdbcInstructorRepository;
 import ru.cft.focusstart.service.validation.Validator;
 
 import java.util.Collections;
@@ -19,19 +19,19 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Service
 public class DefaultInstructorService implements InstructorService {
 
-    private static final DefaultInstructorService INSTANCE = new DefaultInstructorService();
+    private final InstructorRepository instructorRepository;
+    private final InstructorMapper instructorMapper;
+    private final WeaponMapper weaponMapper;
+    private final VisitMapper visitMapper;
 
-    private final InstructorRepository instructorRepository = JdbcInstructorRepository.getInstance();
-    private final InstructorMapper instructorMapper = InstructorMapper.getInstance();
-    private final WeaponMapper weaponMapper = WeaponMapper.getInstance();
-    private final VisitMapper visitMapper = VisitMapper.getInstance();
-
-    private DefaultInstructorService() {}
-
-    public static InstructorService getInstance() {
-        return INSTANCE;
+    public DefaultInstructorService(InstructorRepository instructorRepository, InstructorMapper instructorMapper, WeaponMapper weaponMapper, VisitMapper visitMapper) {
+        this.instructorRepository = instructorRepository;
+        this.instructorMapper = instructorMapper;
+        this.weaponMapper = weaponMapper;
+        this.visitMapper = visitMapper;
     }
 
     @Override

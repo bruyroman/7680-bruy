@@ -1,5 +1,6 @@
 package ru.cft.focusstart.service.visit;
 
+import org.springframework.stereotype.Service;
 import ru.cft.focusstart.api.dto.VisitDto;
 import ru.cft.focusstart.entity.Instructor;
 import ru.cft.focusstart.entity.Person;
@@ -8,10 +9,7 @@ import ru.cft.focusstart.entity.Weapon;
 import ru.cft.focusstart.exception.ObjectNotFoundException;
 import ru.cft.focusstart.mapper.VisitMapper;
 import ru.cft.focusstart.repository.instructor.InstructorRepository;
-import ru.cft.focusstart.repository.instructor.JdbcInstructorRepository;
-import ru.cft.focusstart.repository.visit.JdbcVisitRepository;
 import ru.cft.focusstart.repository.visit.VisitRepository;
-import ru.cft.focusstart.repository.weapon.JdbcWeaponRepository;
 import ru.cft.focusstart.repository.weapon.WeaponRepository;
 import ru.cft.focusstart.service.validation.Validator;
 
@@ -20,19 +18,19 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Service
 public class DefaultVisitService implements VisitService {
 
-    private static final DefaultVisitService INSTANCE = new DefaultVisitService();
+    private final InstructorRepository instructorRepository;
+    private final WeaponRepository weaponRepository;
+    private final VisitRepository visitRepository;
+    private final VisitMapper visitMapper;
 
-    private final InstructorRepository instructorRepository = JdbcInstructorRepository.getInstance();
-    private final WeaponRepository weaponRepository = JdbcWeaponRepository.getInstance();
-    private final VisitRepository visitRepository = JdbcVisitRepository.getInstance();
-    private final VisitMapper visitMapper = VisitMapper.getInstance();
-
-    private DefaultVisitService() {}
-
-    public static VisitService getInstance() {
-        return INSTANCE;
+    public DefaultVisitService(InstructorRepository instructorRepository, WeaponRepository weaponRepository, VisitRepository visitRepository, VisitMapper visitMapper) {
+        this.instructorRepository = instructorRepository;
+        this.weaponRepository = weaponRepository;
+        this.visitRepository = visitRepository;
+        this.visitMapper = visitMapper;
     }
 
     @Override
