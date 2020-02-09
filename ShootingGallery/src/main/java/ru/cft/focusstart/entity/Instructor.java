@@ -3,6 +3,8 @@ package ru.cft.focusstart.entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.hibernate.annotations.Type;
+import ru.cft.focusstart.entity.types.InstructorCategory;
 
 import javax.persistence.*;
 import java.util.List;
@@ -21,8 +23,8 @@ public class Instructor {
     @JoinColumn(name = "\"PERSON_ID\"")
     private Person person;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "\"CATEGORY\"", nullable=false)
+    @Type(type = "ru.cft.focusstart.entity.types.HibernateInstructorCategoryUserType")
     private InstructorCategory category;
 
     @ToString.Exclude

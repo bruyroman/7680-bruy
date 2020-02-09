@@ -2,7 +2,7 @@ package ru.cft.focusstart.repository.instructor;
 
 import org.springframework.stereotype.Repository;
 import ru.cft.focusstart.entity.Instructor;
-import ru.cft.focusstart.entity.InstructorCategory;
+import ru.cft.focusstart.entity.types.InstructorCategory;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
