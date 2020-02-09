@@ -4,8 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import ru.cft.focusstart.api.dto.VisitDto;
+import ru.cft.focusstart.service.validation.Validator;
 import ru.cft.focusstart.service.visit.VisitService;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
@@ -21,7 +24,18 @@ public class VisitController {
             @RequestParam(name = Parameters.VISIT_DATE_TIME_TO, required = false) String dateTimeTo,
             @RequestParam(name = Parameters.VISIT_FULL_NAME_CLIENT, required = false) String fullNameClient
     ) {
-        return visitService.get(dateTimeFrom, dateTimeTo, fullNameClient);
+        LocalDateTime localDateTimeFrom = parseLocalDateTime("dateTimeFrom", dateTimeFrom);
+        LocalDateTime localDateTimeTo = parseLocalDateTime("dateTimeTo", dateTimeTo);
+        return visitService.get(localDateTimeFrom, localDateTimeTo, fullNameClient);
+    }
+
+    private LocalDateTime parseLocalDateTime(String paremeterName, String strLocalDateTime) {
+        LocalDateTime localDateTime = null;
+        if (strLocalDateTime != null && strLocalDateTime.length() > 0) {
+            Validator.checkLocalDateTime(paremeterName, strLocalDateTime);
+            localDateTime = LocalDateTime.parse(strLocalDateTime, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        }
+        return localDateTime;
     }
 
     @GetMapping(path = Paths.ID)

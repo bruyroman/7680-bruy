@@ -2,11 +2,12 @@ package ru.cft.focusstart.service.visit;
 
 import ru.cft.focusstart.api.dto.VisitDto;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface VisitService {
 
-    List<VisitDto> get(String dateTimeFrom, String dateTimeTo, String fullNameClient);
+    List<VisitDto> get(LocalDateTime dateTimeFrom, LocalDateTime dateTimeTo, String fullNameClient);
 
     VisitDto getById(Long id);
 

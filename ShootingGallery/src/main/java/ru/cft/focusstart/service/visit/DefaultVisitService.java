@@ -16,7 +16,6 @@ import ru.cft.focusstart.repository.weapon.WeaponRepository;
 import ru.cft.focusstart.service.validation.Validator;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,23 +30,11 @@ public class DefaultVisitService implements VisitService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<VisitDto> get(String dateTimeFrom, String dateTimeTo, String fullNameClient) {
-        LocalDateTime localDateTimeFrom = parseLocalDateTime("dateTimeFrom", dateTimeFrom);
-        LocalDateTime localDateTimeTo = parseLocalDateTime("dateTimeTo", dateTimeTo);
-
-        return visitRepository.get(localDateTimeFrom, localDateTimeTo, fullNameClient)
+    public List<VisitDto> get(LocalDateTime dateTimeFrom, LocalDateTime dateTimeTo, String fullNameClient) {
+        return visitRepository.get(dateTimeFrom, dateTimeTo, fullNameClient)
                 .stream()
                 .map(visitMapper::toDto)
                 .collect(Collectors.toList());
-    }
-
-    private LocalDateTime parseLocalDateTime(String paremeterName, String strLocalDateTime) {
-        LocalDateTime localDateTime = null;
-        if (strLocalDateTime != null && strLocalDateTime.length() > 0) {
-            Validator.checkLocalDateTime(paremeterName, strLocalDateTime);
-            localDateTime = LocalDateTime.parse(strLocalDateTime, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-        }
-        return localDateTime;
     }
 
     @Override
