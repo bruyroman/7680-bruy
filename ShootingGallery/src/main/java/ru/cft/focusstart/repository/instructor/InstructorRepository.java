@@ -1,7 +1,7 @@
 package ru.cft.focusstart.repository.instructor;
 
 import ru.cft.focusstart.entity.Instructor;
-import ru.cft.focusstart.entity.InstructorCategory;
+import ru.cft.focusstart.entity.types.InstructorCategory;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,6 +13,4 @@ public interface InstructorRepository {
     Optional<Instructor> getById(Long id);
 
     void add(Instructor instructor);
-
-    void update(Instructor instructor);
 }

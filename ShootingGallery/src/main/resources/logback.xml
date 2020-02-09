@@ -7,6 +7,9 @@
         </encoder>
     </appender>
 
+    <logger name="org.hibernate.SQL" level="debug"/>
+    <logger name="org.springframework" level="debug"/>
+
     <appender name="file" class="ch.qos.logback.core.FileAppender">
         <file>ShootingGallery.log</file>
         <append>false</append>

@@ -1,6 +1,6 @@
 package ru.cft.focusstart.service.validation;
 
-import ru.cft.focusstart.entity.InstructorCategory;
+import ru.cft.focusstart.entity.types.InstructorCategory;
 import ru.cft.focusstart.exception.InvalidParametersException;
 
 import java.time.LocalDateTime;

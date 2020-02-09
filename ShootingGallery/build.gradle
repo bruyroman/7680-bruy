@@ -14,6 +14,11 @@ dependencies {
     compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.10'
 
     implementation group: 'org.springframework', name: 'spring-context', version: '5.2.2.RELEASE'
+    implementation group: 'org.springframework', name: 'spring-orm', version: '5.2.2.RELEASE'
+
+    implementation group: 'javax.persistence', name: 'javax.persistence-api', version: '2.2'
+    implementation group: 'org.hibernate', name: 'hibernate-core', version: '5.4.10.Final'
+    runtime group: 'org.hibernate', name: 'hibernate-core', version: '5.4.10.Final'
 
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.10.1'
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.9.8'

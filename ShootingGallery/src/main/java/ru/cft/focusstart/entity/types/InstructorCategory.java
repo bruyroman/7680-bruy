@@ -1,4 +1,4 @@
-package ru.cft.focusstart.entity;
+package ru.cft.focusstart.entity.types;
 
 import lombok.Getter;
 
@@ -9,9 +9,14 @@ public enum InstructorCategory {
     HIGHEST("HIGHEST");
 
     @Getter
-    private String name;
+    private final String name;
 
     InstructorCategory(String name) {
         this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return getName();
     }
 }

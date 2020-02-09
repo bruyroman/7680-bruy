@@ -1,6 +1,8 @@
 package ru.cft.focusstart.service.weapon;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.cft.focusstart.api.dto.WeaponDto;
 import ru.cft.focusstart.entity.Instructor;
 import ru.cft.focusstart.entity.Weapon;
@@ -14,19 +16,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class DefaultWeaponService implements WeaponService {
 
     private final InstructorRepository instructorRepository;
     private final WeaponRepository weaponRepository;
     private final WeaponMapper weaponMapper;
 
-    private DefaultWeaponService(InstructorRepository instructorRepository, WeaponRepository weaponRepository, WeaponMapper weaponMapper) {
-        this.instructorRepository = instructorRepository;
-        this.weaponRepository = weaponRepository;
-        this.weaponMapper = weaponMapper;
-    }
-
     @Override
+    @Transactional(readOnly = true)
     public List<WeaponDto> get(String type, String model, String fullNameInstructor) {
         return weaponRepository.get(type, model, fullNameInstructor)
                 .stream()
@@ -35,6 +33,7 @@ public class DefaultWeaponService implements WeaponService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public WeaponDto getById(Long id) {
         Validator.checkNotNull("id", id);
 
@@ -49,6 +48,7 @@ public class DefaultWeaponService implements WeaponService {
     }
 
     @Override
+    @Transactional
     public WeaponDto create(WeaponDto weaponDto) {
         validate(weaponDto);
 
@@ -86,6 +86,7 @@ public class DefaultWeaponService implements WeaponService {
     }
 
     @Override
+    @Transactional
     public WeaponDto merge(Long id, WeaponDto weaponDto) {
         Validator.checkNotNull("id", id);
         validate(weaponDto);
@@ -106,8 +107,6 @@ public class DefaultWeaponService implements WeaponService {
             Instructor instructor = getInstructor(weaponDto.getInstructorId());
             weapon.setInstructor(instructor);
         }
-
-        weaponRepository.update(weapon);
 
         return weapon;
     }
