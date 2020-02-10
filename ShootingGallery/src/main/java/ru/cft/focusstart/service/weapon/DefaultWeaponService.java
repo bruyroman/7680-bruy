@@ -26,7 +26,7 @@ public class DefaultWeaponService implements WeaponService {
     @Override
     @Transactional(readOnly = true)
     public List<WeaponDto> get(String type, String model, String fullNameInstructor) {
-        return weaponRepository.get(type, model, fullNameInstructor)
+        return weaponRepository.find(type == null ? "" : type, model == null ? "" : model, fullNameInstructor == null ? "" : fullNameInstructor)
                 .stream()
                 .map(weaponMapper::toDto)
                 .collect(Collectors.toList());
@@ -43,7 +43,7 @@ public class DefaultWeaponService implements WeaponService {
     }
 
     private Weapon getWeapon(Long id) {
-        return weaponRepository.getById(id)
+        return weaponRepository.findById(id)
                 .orElseThrow(() -> new ObjectNotFoundException(String.format("Weapon with id %s not found", id)));
     }
 
@@ -75,13 +75,11 @@ public class DefaultWeaponService implements WeaponService {
         weapon.setSeries(weaponDto.getSeries() != null ? weaponDto.getSeries() : "");
         weapon.setNumber(weaponDto.getNumber());
 
-        weaponRepository.add(weapon);
-
-        return weapon;
+        return weaponRepository.save(weapon);
     }
 
     private Instructor getInstructor(Long id) {
-        return instructorRepository.getById(id)
+        return instructorRepository.findById(id)
                 .orElseThrow(() -> new ObjectNotFoundException(String.format("Instructor with id %s not found", id)));
     }
 
@@ -91,7 +89,7 @@ public class DefaultWeaponService implements WeaponService {
         Validator.checkNotNull("id", id);
         validate(weaponDto);
 
-        Weapon weapon = weaponRepository.getById(id)
+        Weapon weapon = weaponRepository.findById(id)
                 .map(existing -> update(existing, weaponDto))
                 .orElseGet(() -> add(id, weaponDto));
 

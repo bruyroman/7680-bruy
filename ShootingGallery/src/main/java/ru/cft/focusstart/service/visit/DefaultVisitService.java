@@ -31,7 +31,7 @@ public class DefaultVisitService implements VisitService {
     @Override
     @Transactional(readOnly = true)
     public List<VisitDto> get(LocalDateTime dateTimeFrom, LocalDateTime dateTimeTo, String fullNameClient) {
-        return visitRepository.get(dateTimeFrom, dateTimeTo, fullNameClient)
+        return visitRepository.find(dateTimeFrom, dateTimeTo, fullNameClient == null ? "" : fullNameClient)
                 .stream()
                 .map(visitMapper::toDto)
                 .collect(Collectors.toList());
@@ -48,7 +48,7 @@ public class DefaultVisitService implements VisitService {
     }
 
     private Visit getVisit(Long id) {
-        return visitRepository.getById(id)
+        return visitRepository.findById(id)
                 .orElseThrow(() -> new ObjectNotFoundException(String.format("Visit with id %s not found", id)));
     }
 
@@ -83,9 +83,7 @@ public class DefaultVisitService implements VisitService {
         visit.setDatetimeStart(visitDto.getDatetimeStart());
         visit.setDatetimeEnd(visitDto.getDatetimeEnd());
 
-        visitRepository.add(visit);
-
-        return visit;
+        return visitRepository.save(visit);
     }
 
     private Person toClient(VisitDto visitDto) {
@@ -101,12 +99,12 @@ public class DefaultVisitService implements VisitService {
     }
 
     private Instructor getInstructor(Long id) {
-        return instructorRepository.getById(id)
+        return instructorRepository.findById(id)
                 .orElseThrow(() -> new ObjectNotFoundException(String.format("Instructor with id %s not found", id)));
     }
 
     private Weapon getWeapon(Long id) {
-        return weaponRepository.getById(id)
+        return weaponRepository.findById(id)
                 .orElseThrow(() -> new ObjectNotFoundException(String.format("Weapon with id %s not found", id)));
     }
 
@@ -116,7 +114,7 @@ public class DefaultVisitService implements VisitService {
         Validator.checkNotNull("id", id);
         validate(visitDto);
 
-        Visit visit = visitRepository.getById(id)
+        Visit visit = visitRepository.findById(id)
                 .map(existing -> update(existing, visitDto))
                 .orElseGet(() -> add(id, visitDto));
 

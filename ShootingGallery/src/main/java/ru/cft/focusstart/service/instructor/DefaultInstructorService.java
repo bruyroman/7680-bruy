@@ -33,12 +33,13 @@ public class DefaultInstructorService implements InstructorService {
     @Override
     @Transactional(readOnly = true)
     public List<InstructorDto> get(String fullName, String category) {
-        InstructorCategory instructorCategory = null;
-        if (category != null && category.length() > 0) {
+        String instructorCategory = category == null ? "" : category.trim();
+
+        if (instructorCategory.length() > 0) {
             Validator.checkCategory("category", category);
-            instructorCategory = InstructorCategory.valueOf(category);
         }
-        return instructorRepository.get(fullName, instructorCategory)
+
+        return instructorRepository.find(fullName == null ? "" : fullName, instructorCategory)
                 .stream()
                 .map(instructorMapper::toDto)
                 .collect(Collectors.toList());
@@ -55,7 +56,7 @@ public class DefaultInstructorService implements InstructorService {
     }
 
     private Instructor getInstructor(Long id) {
-        return instructorRepository.getById(id)
+        return instructorRepository.findById(id)
                 .orElseThrow(() -> new ObjectNotFoundException(String.format("Instructor with id %s not found", id)));
     }
 
@@ -107,9 +108,7 @@ public class DefaultInstructorService implements InstructorService {
         instructor.setPerson(toPerson(instructorDto));
         instructor.setCategory(InstructorCategory.valueOf(instructorDto.getCategory()));
 
-        instructorRepository.add(instructor);
-
-        return instructor;
+        return instructorRepository.save(instructor);
     }
 
     private Person toPerson(InstructorDto instructorDto) {
@@ -130,7 +129,7 @@ public class DefaultInstructorService implements InstructorService {
         Validator.checkNotNull("id", id);
         validate(instructorDto);
 
-        Instructor instructor = instructorRepository.getById(id)
+        Instructor instructor = instructorRepository.findById(id)
                 .map(existing -> update(existing, instructorDto))
                 .orElseGet(() -> add(id, instructorDto));
 
