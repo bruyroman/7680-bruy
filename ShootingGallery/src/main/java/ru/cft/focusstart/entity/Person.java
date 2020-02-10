@@ -7,23 +7,23 @@ import java.time.LocalDate;
 
 @Data
 @Entity
-@Table(name = "\"PERSON\"")
+@Table(name = "PERSON")
 public class Person {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "\"ID\"")
+    @Column(name = "ID")
     private Long id;
 
-    @Column(name = "\"SURNAME\"", nullable = false, length = 100)
+    @Column(name = "SURNAME", nullable = false, length = 100)
     private String surname;
 
-    @Column(name = "\"NAME\"", nullable = false, length = 100)
+    @Column(name = "NAME", nullable = false, length = 100)
     private String name;
 
-    @Column(name = "\"PATRONYMIC\"", length = 100)
+    @Column(name = "PATRONYMIC", length = 100)
     private String patronymic;
 
-    @Column(name = "\"BIRTHDATE\"", nullable = false, length = 100)
+    @Column(name = "BIRTHDATE", nullable = false, length = 100)
     private LocalDate birthdate;
 }

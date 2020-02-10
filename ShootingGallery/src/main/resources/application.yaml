@@ -3,8 +3,8 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/SHOOTING_GALLERY
-    username: adminDB
+    url: jdbc:postgresql://localhost:5432/shooting_gallery
+    username: admindb
     password: password
     hikari:
       maximum-pool-size: 10
