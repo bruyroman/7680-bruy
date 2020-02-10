@@ -1,0 +1,10 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/SHOOTING_GALLERY
+    username: adminDB
+    password: password
+    hikari:
+      maximum-pool-size: 10
