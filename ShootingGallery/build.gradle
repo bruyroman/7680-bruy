@@ -1,4 +1,9 @@
-apply plugin: 'war'
+plugins {
+    id 'org.springframework.boot' version '2.2.4.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+    id 'java'
+    id 'war'
+}
 
 group 'ru.cft.focusstart'
 version 'unspecified'
@@ -10,25 +15,13 @@ repositories {
 }
 
 dependencies {
-    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.10'
-    compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.10'
+    annotationProcessor group: 'org.springframework.boot', name: 'spring-boot-configuration-processor'
 
-    implementation group: 'org.springframework', name: 'spring-context', version: '5.2.2.RELEASE'
-    implementation group: 'org.springframework', name: 'spring-orm', version: '5.2.2.RELEASE'
-    implementation group: 'org.springframework', name: 'spring-webmvc', version: '5.2.2.RELEASE'
+    annotationProcessor group: 'org.projectlombok', name: 'lombok'
+    compileOnly group: 'org.projectlombok', name: 'lombok'
 
-    implementation group: 'javax.persistence', name: 'javax.persistence-api', version: '2.2'
-    implementation group: 'org.hibernate', name: 'hibernate-core', version: '5.4.10.Final'
-    runtime group: 'org.hibernate', name: 'hibernate-core', version: '5.4.10.Final'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa'
 
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.10.1'
-    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.9.8'
-
-    providedCompile group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
-
-    implementation group: 'com.zaxxer', name: 'HikariCP', version: '3.4.1'
-    runtime group: 'org.postgresql', name: 'postgresql', version: '42.2.9'
-
-    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.26'
-    runtime group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+    runtime group: 'org.postgresql', name: 'postgresql'
 }

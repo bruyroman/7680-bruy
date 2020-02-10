@@ -7,29 +7,29 @@ import java.time.LocalDateTime;
 
 @Data
 @Entity
-@Table(name = "\"VISIT\"")
+@Table(name = "VISIT")
 public class Visit {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "\"ID\"")
+    @Column(name = "ID")
     private Long id;
 
     @OneToOne(optional=false, cascade=CascadeType.ALL)
-    @JoinColumn(name = "\"CLIENT_ID\"")
+    @JoinColumn(name = "CLIENT_ID")
     private Person client;
 
     @ManyToOne(optional=false, fetch=FetchType.LAZY)
-    @JoinColumn(name = "\"INSTRUCTOR_ID\"")
+    @JoinColumn(name = "INSTRUCTOR_ID")
     private Instructor instructor;
 
     @ManyToOne(optional=false, fetch=FetchType.LAZY)
-    @JoinColumn(name = "\"WEAPON_ID\"")
+    @JoinColumn(name = "WEAPON_ID")
     private Weapon weapon;
 
-    @Column(name = "\"DATETIME_START\"", nullable=false)
+    @Column(name = "DATETIME_START", nullable=false)
     private LocalDateTime datetimeStart;
 
-    @Column(name = "\"DATETIME_END\"")
+    @Column(name = "DATETIME_END")
     private LocalDateTime datetimeEnd;
 }

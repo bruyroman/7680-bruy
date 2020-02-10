@@ -11,19 +11,19 @@ import java.util.List;
 
 @Data
 @Entity
-@Table(name = "\"INSTRUCTOR\"")
+@Table(name = "INSTRUCTOR")
 public class Instructor {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "\"ID\"")
+    @Column(name = "ID")
     private Long id;
 
     @OneToOne(optional=false, cascade=CascadeType.ALL)
-    @JoinColumn(name = "\"PERSON_ID\"")
+    @JoinColumn(name = "PERSON_ID")
     private Person person;
 
-    @Column(name = "\"CATEGORY\"", nullable=false)
+    @Column(name = "CATEGORY", nullable=false)
     @Type(type = "ru.cft.focusstart.entity.types.HibernateInstructorCategoryUserType")
     private InstructorCategory category;
 
