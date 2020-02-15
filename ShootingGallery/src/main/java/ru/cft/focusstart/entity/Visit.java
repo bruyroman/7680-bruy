@@ -19,11 +19,11 @@ public class Visit {
     @JoinColumn(name = "CLIENT_ID")
     private Person client;
 
-    @ManyToOne(optional=false, fetch=FetchType.LAZY)
+    @ManyToOne(optional=false)
     @JoinColumn(name = "INSTRUCTOR_ID")
     private Instructor instructor;
 
-    @ManyToOne(optional=false, fetch=FetchType.LAZY)
+    @ManyToOne(optional=false)
     @JoinColumn(name = "WEAPON_ID")
     private Weapon weapon;
 

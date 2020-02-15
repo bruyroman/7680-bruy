@@ -1,4 +1,3 @@
-CREATE SCHEMA public;
 
 CREATE TYPE public.instructor_category AS ENUM
     ('ONE', 'TWO', 'THREE', 'HIGHEST');
